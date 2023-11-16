@@ -56,7 +56,7 @@ run_cox_reg_multi <- function(dataframe, strata) { # Multi-adjusted
     drop_na({{ strata }}) |> 
     nest() |> 
     mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week +
+                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week +
                                              bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year +
                                              age + sex, data =.x) |> 
                                 broom::tidy(conf.int = TRUE, exponentiate = TRUE))
@@ -77,7 +77,7 @@ run_cox_reg_crude <- function(dataframe, strata) { # Crude
     drop_na({{ strata}} ) |> 
     nest() |> 
     mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week + 
+                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + 
                                              age, data =.x) |> 
                                 broom::tidy(conf.int = TRUE, exponentiate = TRUE))
            

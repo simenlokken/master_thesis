@@ -37,7 +37,7 @@ hunt_1_cleaned_data <- full_cleaned_data |>
       exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5,
       exercise_frequency_per_week == "Omtrent hver dag" ~ 5
     ),
-    pa_hrs_per_week = (minutes_duration_each_exercise_bout * frequency_per_week) / 60,
+    pa_minutes_per_week = minutes_duration_each_exercise_bout * frequency_per_week,
     follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
     death_all_cause = as.numeric(death_all_cause), # Surv() input needs to be numeric
     packs_of_smoke_per_year = ifelse(is.na(packs_of_smoke_per_year), 0, packs_of_smoke_per_year) # Compute all smoking NA's to 0
@@ -47,13 +47,13 @@ hunt_1_cleaned_data <- full_cleaned_data |>
 
 # Multi-adjusted Cox model, adjusted for BP, BMI, smoking (cont), age and sex
 
-hunt_1_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week +
+hunt_1_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week +
                                 bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year +
                                 age + sex, data = hunt_1_cleaned_data)
 
 # Crude Cox model, adjusted for age
 
-hunt_1_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week + age,
+hunt_1_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + age,
                               data = hunt_1_cleaned_data)
 
 # FOLLOW-UP 
@@ -106,11 +106,11 @@ hunt_2_cleaned_data <- full_cleaned_data |>
   ) |> 
   drop_na(exercise_time_per_week, end_date_death, participation_date, death_all_cause) |> 
   mutate(
-    pa_hrs_per_week = case_when(
+    pa_minutes_per_week = case_when(
       exercise_time_per_week == "Ingen" ~ 0,
-      exercise_time_per_week == "Under 1 time" ~ 0.5,
-      exercise_time_per_week == "1-2 timer" ~ 1.5,
-      exercise_time_per_week == "3 timer eller mer" ~ 3.5
+      exercise_time_per_week == "Under 1 time" ~ 30,
+      exercise_time_per_week == "1-2 timer" ~ 90,
+      exercise_time_per_week == "3 timer eller mer" ~ 210
     ),
     follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
     death_all_cause = as.numeric(death_all_cause),
@@ -168,7 +168,7 @@ hunt_3_cleaned_data <- full_cleaned_data |>
       exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5, #?
       exercise_frequency_per_week == "Omtrent hver dag" ~ 5 #?
     ),
-    pa_hrs_per_week = (minutes_duration_each_exercise_bout * frequency_per_week) / 60,
+    pa_minutes_per_week = minutes_duration_each_exercise_bout * frequency_per_week,
     follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
     death_all_cause = as.numeric(death_all_cause),
     packs_of_smoke_per_year = ifelse(is.na(packs_of_smoke_per_year), 0, packs_of_smoke_per_year)
@@ -178,13 +178,13 @@ hunt_3_cleaned_data <- full_cleaned_data |>
 
 # Multi-adjusted Cox model, BP, BMI, smoking, age and sex
 
-hunt_3_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week +
+hunt_3_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week +
                                 bp_diastolic + bp_systolic + bmi +
                                 packs_of_smoke_per_year + age + sex, data = hunt_3_cleaned_data)
 
 # Crude model, adjusted for age
 
-hunt_3_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week + age,
+hunt_3_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + age,
                               data = hunt_3_cleaned_data)
 
 # FOLLOW-UP
@@ -225,7 +225,7 @@ hunt_4_cleaned_data <- full_cleaned_data |>
       exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5,
       exercise_frequency_per_week == "Omtrent hver dag" ~ 5
     ),
-    pa_hrs_per_week = (minutes_duration_each_exercise_bout * frequency_per_week) / 60,
+    pa_minutes_per_week = minutes_duration_each_exercise_bout * frequency_per_week,
     follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
     death_all_cause = as.numeric(death_all_cause),
     packs_of_smoke_per_year = ifelse(is.na(packs_of_smoke_per_year), 0, packs_of_smoke_per_year)
@@ -235,11 +235,11 @@ hunt_4_cleaned_data <- full_cleaned_data |>
 
 # Cox Regression
 
-hunt_4_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week + 
+hunt_4_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + 
                                 bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year + age + sex, 
                               data = hunt_4_cleaned_data)
 
-hunt_4_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week + age,
+hunt_4_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + age,
                               data = hunt_4_cleaned_data)
 
 # FOLLOW-UP
