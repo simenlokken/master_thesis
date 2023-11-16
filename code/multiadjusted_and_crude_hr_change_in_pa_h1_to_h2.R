@@ -76,15 +76,6 @@ hunt_1_to_2_cleaned_data <- full_cleaned_data |>
     packs_of_smoke_per_year_h2 = ifelse(is.na(packs_of_smoke_per_year_h2), 0, packs_of_smoke_per_year_h2)
   ) |>
   
-  # Creating a categorical LTPA based on WHO recommendations
+  # Creating a variable calculating the difference between HUNT 1 and HUNT 2
   
-  mutate(
-    who_recommendation_h1 = case_when(
-      pa_minutes_per_week_h1 
-    ),
-    who_recommendation_h2 = case_when(
-      pa_minutes_per_week < 
-      
-    )
-    
-  )
+  mutate(pa_minutes_per_week_diff_h1_h2 = pa_minutes_per_week_h2 - pa_minutes_per_week_h1)
