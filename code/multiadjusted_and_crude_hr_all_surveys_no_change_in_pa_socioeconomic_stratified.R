@@ -49,14 +49,14 @@ hunt_4_cleaned_data <- hunt_4_cleaned_data |>
 
 # Creating two functions for easier iteration through all Cox analyses and efficiency. This is why all variable names across the separate surveys were matched, to be able to easily create use functions
 
-run_cox_reg_multi <- function(dataframe, strata) { # Multi-adjusted
+run_cox_reg_multi <- function(dataframe, strata, follow_up_time, covariaties) { # Multi-adjusted
   
   result <- dataframe |> 
     group_by({{ strata }}) |> 
     drop_na({{ strata }}) |> 
     nest() |> 
     mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week +
+                              .f = ~ coxph(Surv(follow_up_time, death_all_cause) ~ pa_hrs_per_week +
                                              bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year +
                                              age + sex, data =.x) |> 
                                 broom::tidy(conf.int = TRUE, exponentiate = TRUE))
