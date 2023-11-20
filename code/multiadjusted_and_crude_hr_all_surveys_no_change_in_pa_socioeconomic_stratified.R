@@ -11,7 +11,7 @@ library(survival)
 
 # HUNT 1
 
-hunt_1_cleaned_data <- hunt_1_cleaned_data |> 
+hunt_1_cleaned_data_socio_strat <- hunt_1_cleaned_data |> 
   rename(education_level = educ_nt1blq2) |> 
   mutate(socioeconomic_class = as.factor(case_when( # Constructing a socioeconomic variable
     education_level %in% c("7-årig folkeskole eller kortere", "9-årig grunnskole", "Real- eller middelskole, grunnskolen 10.år", "Framhalds- eller fortsettelsesskole") ~ "low",
@@ -21,7 +21,7 @@ hunt_1_cleaned_data <- hunt_1_cleaned_data |>
 
 # HUNT 2
 
-hunt_2_cleaned_data <- hunt_2_cleaned_data |> 
+hunt_2_cleaned_data_socio_strat <- hunt_2_cleaned_data |> 
   rename(education_level = educ_nt2blq1) |> 
   mutate(socioeconomic_class = as.factor(case_when(
     education_level %in% c("Grunnskole 7-10 år, framhaldsskole, folkehøgskole") ~ "low",
@@ -31,7 +31,7 @@ hunt_2_cleaned_data <- hunt_2_cleaned_data |>
 
 # HUNT 3
 
-hunt_3_cleaned_data <- hunt_3_cleaned_data |> 
+hunt_3_cleaned_data_socio_strat <- hunt_3_cleaned_data |> 
   rename(occupational_type = wor_tit_isco1_nt3bli) |> 
   mutate(socioeconomic_class = as.factor(case_when(
     occupational_type %in% c("Yrker uten krav til utdanning", "Yrker innen jordbruk, skogbruk og fiske", "Prosess- og maskinoperatører, transportarbeidere mv.") ~ "low",
@@ -41,7 +41,7 @@ hunt_3_cleaned_data <- hunt_3_cleaned_data |>
 
 # HUNT 4
 
-hunt_4_cleaned_data <- hunt_4_cleaned_data |> 
+hunt_4_cleaned_data_socio_strat <- hunt_4_cleaned_data |> 
   rename(education_level = educ_nt4blq1) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
@@ -54,39 +54,47 @@ hunt_4_cleaned_data <- hunt_4_cleaned_data |>
 
 # HUNT 1, stratified multi-adjusted and crude Cox models
 
-hunt_1_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_1_cleaned_data, socioeconomic_class) # Multi-adjusted
+run_cox_reg(hunt_1_cleaned_data_socio_strat, 
+                  strata = socioeconomic_class,
+                  covariates = c("age", "pa_hrs_per_week", "sex"),
+                  follow_up_time = follow_up_time_in_years_h1
+)
 
-hunt_1_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_1_cleaned_data, socioeconomic_class) # Crude
+
+
+hunt_1_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_1_cleaned_data_socio_strat, socioeconomic_class) # Multi-adjusted
+
+hunt_1_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_1_cleaned_data_socio_strat, socioeconomic_class) # Crude
 
 # HUNT 2, stratified multi-adjusted and crude models
 
-hunt_2_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_2_cleaned_data, socioeconomic_class) # Multi-adjusted
+hunt_2_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_2_cleaned_data_socio_strat, socioeconomic_class) # Multi-adjusted
 
-hunt_2_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_2_cleaned_data, socioeconomic_class) # Crude
+hunt_2_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_2_cleaned_data_socio_strat, socioeconomic_class) # Crude
 
 # HUNT 3, stratified multi-adjusted and crude models
 
-hunt_3_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_3_cleaned_data, socioeconomic_class) # Multi-adjusted
+hunt_3_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_3_cleaned_data_socio_strat, socioeconomic_class) # Multi-adjusted
 
-hunt_3_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_3_cleaned_data, socioeconomic_class) # Crude
+hunt_3_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_3_cleaned_data_socio_strat, socioeconomic_class) # Crude
 
 # HUNT 4, stratified multi-adjusted and crude models
 
-hunt_4_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_4_cleaned_data, socioeconomic_class) # Multi-adjusted
+hunt_4_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_4_cleaned_data_socio_strat, socioeconomic_class) # Multi-adjusted
 
-hunt_4_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_4_cleaned_data, socioeconomic_class) # Crude
+hunt_4_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_4_cleaned_data_socio_strat, socioeconomic_class) # Crude
 
 # FOLLOW-UP 
 
 # HUNT 1, multi-adjusted and crude
 
-hunt_1_f_up_time_multi_socio_strat <- calculate_follow_up_time_multi(hunt_1_cleaned_data, strata = socioeconomic_class)
+hunt_1_follow_up_time_multi_socio_strat <- calculate_follow_up_time_multi(hunt_1_cleaned_data, strata = socioeconomic_class)
 
-hunt_1_f_up_time_crude_socio_strat <- calculate_follow_up_time_crude(hunt_1_cleaned_data, strata = socioeconomic_class)
+hunt_1_follow_up_time_crude_socio_strat <- calculate_follow_up_time_crude(hunt_1_cleaned_data, strata = socioeconomic_class)
 
 # HUNT 2, multi-adjusted and crude
 
-hunt_2_f_up_time_multi_socio_strat <- calculate_follow_up_time_multi(hunt_2_cleaned_data, strata = socioeconomic_class)
+hunt_2_follow_up_time_multi_socio_strat <- calculate_follow_up_time_multi(hunt_2_cleaned_data, strata = socioeconomic_class)
 
 hunt_2_f_up_time_crude_socio_strat <- calculate_follow_up_time_crude(hunt_2_cleaned_data, strata = socioeconomic_class)
 

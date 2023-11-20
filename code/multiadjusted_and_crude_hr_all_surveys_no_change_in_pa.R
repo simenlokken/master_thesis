@@ -61,14 +61,14 @@ hunt_2_cox_reg_multi <- coxph(Surv(follow_up_time_in_years_h2, death_all_cause) 
                                 bp_systolic_h2 + bp_diastolic_h2 + bmi_h2 +
                                 packs_of_smoke_per_year_h2 + sex + age, data = hunt_2_cleaned_data
 ) |> 
-  broom::tidy(exponentiate = TRUE)
+  broom::tidy(exponentiate = TRUE, conf.int = TRUE)
 
 # Crude model
 
 hunt_2_cox_reg_crude <- coxph(Surv(follow_up_time_in_years_h2, death_all_cause) ~ pa_hrs_per_week_h2 + age,
                         data = hunt_2_cleaned_data
 ) |> 
-  broom::tidy(exponentiate = TRUE)
+  broom::tidy(exponentiate = TRUE, conf.int = TRUE)
 
 # FOLLOW-UP
 
@@ -102,14 +102,14 @@ hunt_3_cox_reg_multi <- coxph(Surv(follow_up_time_in_years_h3, death_all_cause) 
                                 bp_diastolic_h3 + bp_systolic_h3 + bmi_h3 +
                                 packs_of_smoke_per_year_h3 + age + sex, data = hunt_3_cleaned_data
 ) |> 
-  broom::tidy(exponentiate = TRUE)
+  broom::tidy(exponentiate = TRUE, conf.int = TRUE)
 
 # Crude model, adjusted for age
 
 hunt_3_cox_reg_crude <- coxph(Surv(follow_up_time_in_years_h3, death_all_cause) ~ pa_hrs_per_week_h3 + age,
                               data = hunt_3_cleaned_data
 ) |> 
-  broom::tidy(exponentiate = TRUE)
+  broom::tidy(exponentiate = TRUE, conf.int = TRUE)
 
 # FOLLOW-UP
 
@@ -144,12 +144,12 @@ hunt_4_cox_reg_multi <- coxph(Surv(follow_up_time_in_years_h4, death_all_cause) 
                               data = hunt_4_cleaned_data
                               
 ) |> 
-  broom::tidy(exponentiate = TRUE)
+  broom::tidy(exponentiate = TRUE, conf.int = TRUE)
 
 hunt_4_cox_reg_crude <- coxph(Surv(follow_up_time_in_years_h4, death_all_cause) ~ pa_hrs_per_week_h4 + age,
                               data = hunt_4_cleaned_data
 ) |> 
-  broom::tidy(exponentiate = TRUE)
+  broom::tidy(exponentiate = TRUE, conf.int = TRUE)
 
 # FOLLOW-UP
 

@@ -14,7 +14,7 @@ source("code/multiadjusted_and_crude_hr_change_in_pa_h1_to_h2.R")
 
 source("code/multiadjusted_and_crude_hr_change_in_pa_h1_to_h2.R")
 
-# Create dataframe
+# Create data frame
 
 hunt_1_to_3_cleaned_data <- full_cleaned_data |> 
   process_hunt_1_variables() |> 
@@ -23,12 +23,3 @@ hunt_1_to_3_cleaned_data <- full_cleaned_data |>
 
 # EDA ON HUNT 1 AND HUNT 3 DATA
 
-# Plot histograms for HUNT 1, HUNT 2 and diff between them
-
-columns_h1_to_h3 <- c("pa_minutes_per_week_h1", "pa_minutes_per_week_h3", "pa_minutes_per_week_diff_h1_h3")
-
-for (column in columns_h1_to_h3) {
-  print(
-    plot_histogram(hunt_1_to_3_cleaned_data, !!sym(column), 30)
-  )
-}

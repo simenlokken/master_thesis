@@ -11,7 +11,7 @@ library(survival)
 
 # HUNT 1
 
-hunt_1_cleaned_data <- hunt_1_cleaned_data |>
+hunt_1_cleaned_data_occu_strat <- hunt_1_cleaned_data |>
   rename(heavy_physical_work = wor_heav_nt1blq2) |> 
   mutate(occupational_pa = case_when(
     heavy_physical_work %in% c("Aldri, eller nesten aldri", "Ganske sjelden") ~ "low",
@@ -20,7 +20,7 @@ hunt_1_cleaned_data <- hunt_1_cleaned_data |>
 
 # HUNT 2
 
-hunt_2_cleaned_data <- hunt_2_cleaned_data |>
+hunt_2_cleaned_data_occu_strat <- hunt_2_cleaned_data |>
   rename(heavy_physical_work = wor_heav_nt2blq2) |> 
   mutate(occupational_pa = case_when(
     heavy_physical_work %in% c("Aldri, eller nesten aldri", "Ganske sjelden") ~ "low",
@@ -29,7 +29,7 @@ hunt_2_cleaned_data <- hunt_2_cleaned_data |>
 
 # HUNT 3
 
-hunt_3_cleaned_data <- hunt_3_cleaned_data |>
+hunt_3_cleaned_data_occu_strat <- hunt_3_cleaned_data |>
   rename(heavy_physical_work = wor_heav_nt3blq2) |> 
   mutate(occupational_pa = case_when(
     heavy_physical_work %in% c("Aldri, eller nesten aldri", "Ganske sjelden") ~ "low",
@@ -38,7 +38,7 @@ hunt_3_cleaned_data <- hunt_3_cleaned_data |>
 
 # HUNT 4
 
-hunt_4_cleaned_data <- hunt_4_cleaned_data |>
+hunt_4_cleaned_data_occu_strat <- hunt_4_cleaned_data |>
   rename(heavy_physical_work = wor_heav_nt4blq2) |> 
   mutate(occupational_pa = case_when(
     heavy_physical_work %in% c("Aldri, eller nesten aldri", "Ganske sjelden") ~ "low",

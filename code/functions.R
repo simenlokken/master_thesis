@@ -2,7 +2,7 @@
 
 # DATA PROCESSING FUNCTIONS
 
-# These functions prepares the data for each HUNT survey
+# These functions prepares the data for each HUNT survey for the analyses related to change in LTPA
 
 process_hunt_1 <- function(dataframe) {
   
@@ -49,7 +49,7 @@ process_hunt_1 <- function(dataframe) {
       packs_of_smoke_per_year_h1 = ifelse(is.na(packs_of_smoke_per_year_h1), 0, packs_of_smoke_per_year_h1) # Compute all smoking NA's to 0
     )
   
-} # HUNT 1
+}
 
 process_hunt_2 <- function(dataframe) {
   
@@ -136,7 +136,7 @@ process_hunt_3 <- function(dataframe) {
       packs_of_smoke_per_year_h3 = ifelse(is.na(packs_of_smoke_per_year_h3), 0, packs_of_smoke_per_year_h3)
     )
   
-} # HUNT 3
+}
 
 process_hunt_4 <- function(dataframe) {
   
@@ -183,56 +183,51 @@ process_hunt_4 <- function(dataframe) {
       packs_of_smoke_per_year_h4 = ifelse(is.na(packs_of_smoke_per_year_h4), 0, packs_of_smoke_per_year_h4)
     )
   
-} # HUNT 4
+}
 
 # COX REGRESSION FUNCTION
 
 # This function performs a Cox regression and puts it into a tidied format
 
-run_cox_reg_multi <- function(dataframe, strata = NULL, follow_up_time, covariaties) { # Multi-adjusted
+run_cox_reg <- function(dataframe, strata = NULL, follow_up_time, covariates) {
   
   result <- dataframe |> 
-    group_by({{ strata }}) |> 
-    drop_na({{ strata }}) |> 
+    group_by({{strata}}) |> 
+    drop_na({{strata}}) |> 
     nest() |> 
     mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time, death_all_cause) ~ pa_hrs_per_week +
-                                             bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year +
-                                             age + sex, data =.x) |> 
+                              .f = ~ coxph(Surv({{follow_up_time}}, death_all_cause) ~ covariates, data =.x) |> 
                                 broom::tidy(conf.int = TRUE, exponentiate = TRUE))
            
     ) |> 
     unnest(test_results) |> 
-    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
+    select(strata, term, estimate, std.error, conf.low, conf.high) |> 
     ungroup()
   
   return(result)
   
 }
 
-run_cox_reg_crude <- function(dataframe, strata = NULL) { # Crude
+run_cox_reg_crude <- function(dataframe, strata = NULL, follow_up_time) {
   
   result <- dataframe |> 
-    group_by({{ strata}}) |> # strata needs to be in double curly brackets so R understands it should look inside the dataframe
-    drop_na({{ strata}} ) |> 
+    group_by({{strata}}) |> 
+    drop_na({{strata}}) |> 
     nest() |> 
-    mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + 
-                                             age, data =.x) |> 
-                                broom::tidy(conf.int = TRUE, exponentiate = TRUE))
-           
-    ) |> 
-    unnest(test_results) |>  
-    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
+    mutate(test_results = map(.x = data,
+                              .f = ~ coxph(Surv({{follow_up_time}}, death_all_cause) ~ {{covariates}},
+                                           data = .x) |> 
+                                broom::tidy(exponentiate = TRUE, conf.int = TRUE))
+           ) |> 
+    unnest(test_results) |> 
+    select({{strata}}, term, estimate, std.error, conf.low, conf.high) |> 
     ungroup()
-  
-  return(result)
   
 }
 
 # FOLLOW-UP TIME CALCULATION FUNCTION
 
-# This function peforms a follow-up time calculation
+# This function performs a follow-up time calculation
 
 calculate_follow_up_time <- function(dataframe, covariates, strata = NULL, end_date_death, participation_date) {
   
