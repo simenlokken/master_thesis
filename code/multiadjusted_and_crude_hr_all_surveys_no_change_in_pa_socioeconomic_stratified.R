@@ -54,14 +54,6 @@ hunt_4_cleaned_data_socio_strat <- hunt_4_cleaned_data |>
 
 # HUNT 1, stratified multi-adjusted and crude Cox models
 
-run_cox_reg(hunt_1_cleaned_data_socio_strat, 
-                  strata = socioeconomic_class,
-                  covariates = c("age", "pa_hrs_per_week", "sex"),
-                  follow_up_time = follow_up_time_in_years_h1
-)
-
-
-
 hunt_1_cox_reg_multi_socio_strat <- run_cox_reg_multi(hunt_1_cleaned_data_socio_strat, socioeconomic_class) # Multi-adjusted
 
 hunt_1_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_1_cleaned_data_socio_strat, socioeconomic_class) # Crude
@@ -88,24 +80,68 @@ hunt_4_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_4_cleaned_data_socio_
 
 # HUNT 1, multi-adjusted and crude
 
-hunt_1_follow_up_time_multi_socio_strat <- calculate_follow_up_time_multi(hunt_1_cleaned_data, strata = socioeconomic_class)
+hunt_1_follow_up_time_multi_socio_strat <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data_socio_strat, strata = socioeconomic_class,
+                                                        covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                       "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                       "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date
+)
 
-hunt_1_follow_up_time_crude_socio_strat <- calculate_follow_up_time_crude(hunt_1_cleaned_data, strata = socioeconomic_class)
+hunt_1_follow_up_time_crude_socio_strat <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data_socio_strat, strata = socioeconomic_class,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
 # HUNT 2, multi-adjusted and crude
 
-hunt_2_follow_up_time_multi_socio_strat <- calculate_follow_up_time_multi(hunt_2_cleaned_data, strata = socioeconomic_class)
+hunt_2_follow_up_time_multi_socio_strat <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data_socio_strat, strata = socioeconomic_class,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
-hunt_2_f_up_time_crude_socio_strat <- calculate_follow_up_time_crude(hunt_2_cleaned_data, strata = socioeconomic_class)
+hunt_2_follow_up_time_crude_socio_strat <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data_socio_strat, strata = socioeconomic_class,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
 # HUNT 3, multi-adjusted and crude
 
-hunt_3_f_up_time_multi_socio_strat <- calculate_follow_up_time_multi(hunt_3_cleaned_data, strata = socioeconomic_class)
+hunt_3_follow_up_time_multi_socio_strat <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data_socio_strat, strata = socioeconomic_class,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
-hunt_3_f_up_time_crude_socio_strat <- calculate_follow_up_time_crude(hunt_3_cleaned_data, strata = socioeconomic_class)
+hunt_3_follow_up_time_crude_socio_strat <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data_socio_strat, strata = socioeconomic_class,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
 # HUNT 4, multi-adjusted and crude
 
-hunt_4_f_up_time_multi_socio_strat <- calculate_follow_up_time_multi(hunt_4_cleaned_data, strata = socioeconomic_class)
+hunt_4_follow_up_time_multi_socio_strat <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data_socio_strat, strata = socioeconomic_class,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
-hunt_4_f_up_time_crude_socio_strat <- calculate_follow_up_time_crude(hunt_4_cleaned_data, strata = socioeconomic_class)
+hunt_4_follow_up_time_crude_socio_strat <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data_socio_strat, strata = socioeconomic_class,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)

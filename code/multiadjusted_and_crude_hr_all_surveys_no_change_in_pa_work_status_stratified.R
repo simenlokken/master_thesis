@@ -47,54 +47,96 @@ hunt_4_cleaned_data_occu_strat <- hunt_4_cleaned_data |>
 
 # SURVIVAL ANALYSIS
 
-# Using Cox Regression functions created from previous analyses
-
 # HUNT 1
 
-hunt_1_cox_reg_multi_occu_strat <- run_cox_reg_multi(hunt_1_cleaned_data, occupational_pa)
+hunt_1_cox_reg_multi_occu_strat <- run_cox_reg_multi(hunt_1_cleaned_data_occu_strat, occupational_pa)
 
-hunt_1_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_1_cleaned_data, occupational_pa)
+hunt_1_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_1_cleaned_data_occu_strat, occupational_pa)
 
 # HUNT 2
 
-hunt_2_cox_reg_multi_occu_strat <- run_cox_reg_multi(hunt_2_cleaned_data, occupational_pa)
+hunt_2_cox_reg_multi_occu_strat <- run_cox_reg_multi(hunt_2_cleaned_data_occu_strat, occupational_pa)
 
-hunt_2_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_2_cleaned_data, occupational_pa)
+hunt_2_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_2_cleaned_data_occu_strat, occupational_pa)
 
 # HUNT 3
 
-hunt_3_cox_reg_multi_occu_strat <- run_cox_reg_multi(hunt_3_cleaned_data, occupational_pa)
+hunt_3_cox_reg_multi_occu_strat <- run_cox_reg_multi(hunt_3_cleaned_data_occu_strat, occupational_pa)
 
-hunt_3_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_3_cleaned_data, occupational_pa)
+hunt_3_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_3_cleaned_data_occu_strat, occupational_pa)
 
 # HUNT 4
 
-hunt_4_cox_reg_multi_occu_strat <- run_cox_reg_multi(hunt_4_cleaned_data, occupational_pa)
+hunt_4_cox_reg_multi_occu_strat <- run_cox_reg_multi(hunt_4_cleaned_data_occu_strat, occupational_pa)
 
-hunt_4_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_4_cleaned_data, occupational_pa)
+hunt_4_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_4_cleaned_data_occu_strat, occupational_pa)
 
 # FOLLOW-UP 
 
 # HUNT 1, multi-adjusted and crude
 
-hunt_1_f_up_time_multi_occu_strat <- calculate_follow_up_time_multi(hunt_1_cleaned_data, strata = occupational_pa)
+hunt_1_follow_up_time_multi_occu_strat <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data_occu_strat, strata = occupational_pa,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
-hunt_1_f_up_time_crude_occu_strat <- calculate_follow_up_time_crude(hunt_1_cleaned_data, strata = occupational_pa)
+hunt_1_follow_up_time_crude_occu_strat <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data_occu_strat, strata = occupational_pa,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
 # HUNT 2, multi-adjusted and crude
 
-hunt_2_f_up_time_multi_occu_strat <- calculate_follow_up_time_multi(hunt_2_cleaned_data, strata = occupational_pa)
+hunt_2_follow_up_time_multi_occu_strat <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data_socio_strat, strata = occupational_pa,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
-hunt_2_f_up_time_crude_occu_strat <- calculate_follow_up_time_crude(hunt_2_cleaned_data, strata = occupational_pa)
+hunt_2_follow_up_time_crude_occu_strat <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data_socio_strat, strata = occupational_pa,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
 # HUNT 3, multi-adjusted and crude
 
-hunt_3_f_up_time_multi_occu_strat <- calculate_follow_up_time_multi(hunt_3_cleaned_data, strata = occupational_pa)
+hunt_3_follow_up_time_multi_occu_strat <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data_occu_strat, strata = occupational_pa,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
-hunt_3_f_up_time_crude_occu_strat <- calculate_follow_up_time_crude(hunt_3_cleaned_data, strata = occupational_pa)
+hunt_3_follow_up_time_crude_occu_strat <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data_occu_strat, strata = occupational_pa,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
 # HUNT 4, multi-adjusted and crude
 
-hunt_4_f_up_time_multi_occu_strat <- calculate_follow_up_time_multi(hunt_4_cleaned_data, strata = occupational_pa)
+hunt_4_follow_up_time_multi_occu_strat <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data_occu_strat, strata = occupational_pa,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
 
-hunt_4_f_up_time_crude_occu_strat <- calculate_follow_up_time_crude(hunt_4_cleaned_data, strata = occupational_pa)
+hunt_4_follow_up_time_crude_occu_strat <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data_occu_strat, strata = occupational_pa,
+                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause"), 
+                                                                    end_date_death = end_date_death, 
+                                                                    participation_date = participation_date
+)
