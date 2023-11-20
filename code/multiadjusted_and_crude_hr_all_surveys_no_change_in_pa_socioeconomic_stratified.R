@@ -1,6 +1,11 @@
-# SOURCE
+# SOURCE SCRIPTS
 
-source("multiadjusted_and_crude_hr_all_surveys_no_change_in_pa.R")
+source("code/functions.R")
+
+# LOAD PACKAGES 
+
+library(tidyverse)
+library(survival)
 
 # DATA PREPARATION FOR ALL HUNT SURVEYS, i.e., adding a socioeconomic variable to the data. The earlier data preparation done are sourced in.
 
@@ -46,49 +51,6 @@ hunt_4_cleaned_data <- hunt_4_cleaned_data |>
   )
 
 # SURVIVAL ANALYSIS
-
-# Creating two functions for easier iteration through all Cox analyses and efficiency. This is why all variable names across the separate surveys were matched, to be able to easily create use functions
-
-run_cox_reg_multi <- function(dataframe, strata, follow_up_time, covariaties) { # Multi-adjusted
-  
-  result <- dataframe |> 
-    group_by({{ strata }}) |> 
-    drop_na({{ strata }}) |> 
-    nest() |> 
-    mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time, death_all_cause) ~ pa_hrs_per_week +
-                                             bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year +
-                                             age + sex, data =.x) |> 
-                                broom::tidy(conf.int = TRUE, exponentiate = TRUE))
-           
-    ) |> 
-    unnest(test_results) |> 
-    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
-    ungroup()
-  
-  return(result)
-  
-} # Multi-adjusted
-
-run_cox_reg_crude <- function(dataframe, strata) { # Crude
-  
-  result <- dataframe |> 
-    group_by({{ strata}}) |> # strata needs to be in double curly brackets so R understands it should look inside the dataframe
-    drop_na({{ strata}} ) |> 
-    nest() |> 
-    mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + 
-                                             age, data =.x) |> 
-                                broom::tidy(conf.int = TRUE, exponentiate = TRUE))
-           
-    ) |> 
-    unnest(test_results) |>  
-    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
-    ungroup()
-  
-  return(result)
-  
-} # Crude
 
 # HUNT 1, stratified multi-adjusted and crude Cox models
 

@@ -1,7 +1,11 @@
 # SOURCE SCRIPTS 
 
-source("Thesis code/multiadjusted_and_crude_hr_all_surveys_no_change_in_pa.R")
-source("Thesis code/multiadjusted_and_crude_hr_all_surveys_no_change_in_pa_socioeconomic_stratified.R")
+source("code/functions.R")
+
+# LOAD PACKAGES
+
+library(tidyverse)
+library(survival)
 
 # DATA PREPARATION FOR ALL SURVEYS, i.e., constructing a categorical occupational PA variable
 

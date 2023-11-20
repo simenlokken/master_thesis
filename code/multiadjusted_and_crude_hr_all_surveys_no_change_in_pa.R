@@ -1,7 +1,6 @@
 # SOURCE
 
-source("code/pre_analysis_data_preparation.R") # Cleaning script
-source("code/functions.R") # A set of my own functions
+source("code/functions.R")
 
 # LOAD PACKAGES
 
@@ -19,26 +18,35 @@ hunt_1_cleaned_data <- full_cleaned_data |>
 
 hunt_1_cox_reg_multi <- coxph(Surv(follow_up_time_in_years_h1, death_all_cause) ~ pa_hrs_per_week_h1 +
                                 bp_diastolic_h1 + bp_systolic_h1 + bmi_h1 + packs_of_smoke_per_year_h1 +
-                                age + sex, data = hunt_1_cleaned_data)
+                                age + sex, data = hunt_1_cleaned_data
+) |> 
+  broom::tidy(exponentiate = TRUE)
 
 # Crude Cox model, adjusted for age
 
 hunt_1_cox_reg_crude <- coxph(Surv(follow_up_time_in_years_h1, death_all_cause) ~ pa_hrs_per_week_h1 + age,
-                              data = hunt_1_cleaned_data)
+                              data = hunt_1_cleaned_data
+) |> 
+  broom::tidy(exponentiate = TRUE)
 
 # HUNT 1 FOLLOW-UP 
 
 # Follow-up time (person-years) for multi-adjusted and crude model
 
-hunt_1_f_up_time_multi <- calculate_follow_up_time(hunt_1_cleaned_data, covariates = c(age, pa_hrs_per_week_h1),
-                                                   end_date_death = end_date_death, 
-                                                   participation_date = participation_date_h1)
+hunt_1_follow_up_time_multi <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data, 
+                                                        covariates = c("age", "pa_hrs_per_week_h1", "follow_up_time_in_years_h1", 
+                                                                       "death_all_cause", "bp_diastolic_h1", "bp_systolic_h1",
+                                                                       "bmi_h1", "packs_of_smoke_per_year_h1", "sex"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date_h1
+)
 
-hunt_1_cox_reg_crude_covariates <- c(age, sex, pa_hrs_per_week)
-  
-hunt_1_f_up_time_crude <- calculate_follow_up_time(hunt_1_cleaned_data, c(age, pa_hrs_per_week_h1),
-                                                   end_date_death = end_date_death, 
-                                                   participation_date = participation_date_h1)
+hunt_1_follow_up_time_crude <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data, 
+                                                        covariates = c("follow_up_time_in_years_h1", "death_all_cause", 
+                                                                       "age", "pa_hrs_per_week_h1"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date_h1
+)
 
 # HUNT 2 SURVIVAL ANALYSIS
 
@@ -49,72 +57,118 @@ hunt_2_cleaned_data <- full_cleaned_data |>
 
 # Multi-adjusted model, adjusted for BP, BMI, smoking (cont), age and sex
 
-hunt_2_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week +
-                                bp_systolic + bp_diastolic + bmi +
-                                packs_of_smoke_per_year + sex + age, data = hunt_2_cleaned_data)
+hunt_2_cox_reg_multi <- coxph(Surv(follow_up_time_in_years_h2, death_all_cause) ~ pa_hrs_per_week_h2 +
+                                bp_systolic_h2 + bp_diastolic_h2 + bmi_h2 +
+                                packs_of_smoke_per_year_h2 + sex + age, data = hunt_2_cleaned_data
+) |> 
+  broom::tidy(exponentiate = TRUE)
 
 # Crude model
 
-hunt_2_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + age,
-                        data = hunt_2_cleaned_data)
+hunt_2_cox_reg_crude <- coxph(Surv(follow_up_time_in_years_h2, death_all_cause) ~ pa_hrs_per_week_h2 + age,
+                        data = hunt_2_cleaned_data
+) |> 
+  broom::tidy(exponentiate = TRUE)
 
 # FOLLOW-UP
 
 # Follow-up time (person-years) for multi-adjusted and crude model
 
-hunt_2_f_up_time_multi <- calculate_follow_up_time_multi(hunt_2_cleaned_data)
+hunt_2_follow_up_time_multi <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data, 
+                                                        covariates = c("age", "pa_hrs_per_week_h2", "follow_up_time_in_years_h2", 
+                                                                       "death_all_cause", "bp_diastolic_h2", "bp_systolic_h2",
+                                                                       "bmi_h2", "packs_of_smoke_per_year_h2", "sex"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date_h2
+)
 
-hunt_2_f_up_time_crude <- calculate_follow_up_time_crude(hunt_2_cleaned_data)
+hunt_2_follow_up_time_crude <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data, 
+                                                        covariates = c("follow_up_time_in_years_h2", "death_all_cause", 
+                                                                       "age", "pa_hrs_per_week_h2"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date_h2
+)
 
 # HUNT 3 SURVIVAL ANALYSIS
 
 # Create data frame
 
-full_cleaned_data |>
+hunt_3_cleaned_data <- full_cleaned_data |>
   process_hunt_3()
 
 # Multi-adjusted Cox model, BP, BMI, smoking, age and sex
 
-hunt_3_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week +
-                                bp_diastolic + bp_systolic + bmi +
-                                packs_of_smoke_per_year + age + sex, data = hunt_3_cleaned_data)
+hunt_3_cox_reg_multi <- coxph(Surv(follow_up_time_in_years_h3, death_all_cause) ~ pa_hrs_per_week_h3 +
+                                bp_diastolic_h3 + bp_systolic_h3 + bmi_h3 +
+                                packs_of_smoke_per_year_h3 + age + sex, data = hunt_3_cleaned_data
+) |> 
+  broom::tidy(exponentiate = TRUE)
 
 # Crude model, adjusted for age
 
-hunt_3_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + age,
-                              data = hunt_3_cleaned_data)
+hunt_3_cox_reg_crude <- coxph(Surv(follow_up_time_in_years_h3, death_all_cause) ~ pa_hrs_per_week_h3 + age,
+                              data = hunt_3_cleaned_data
+) |> 
+  broom::tidy(exponentiate = TRUE)
 
 # FOLLOW-UP
 
 # Follow-up time (person-years) for multi-adjusted and crude model
 
-hunt_3_f_up_time_multi <- calculate_follow_up_time_multi(hunt_3_cleaned_data)
+hunt_3_follow_up_time_multi <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data, 
+                                                        covariates = c("age", "pa_hrs_per_week_h3", "follow_up_time_in_years_h3", 
+                                                                       "death_all_cause", "bp_diastolic_h3", "bp_systolic_h3",
+                                                                       "bmi_h3", "packs_of_smoke_per_year_h3", "sex"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date_h3
+)
 
-hunt_3_f_up_time_crude <- calculate_follow_up_time_crude(hunt_3_cleaned_data)
+hunt_3_follow_up_time_crude <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data, 
+                                                        covariates = c("follow_up_time_in_years_h3", "death_all_cause", 
+                                                                       "age", "pa_hrs_per_week_h3"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date_h3
+)
 
 # HUNT 4 SURVIVAL ANALYSIS
 
 # Create data frame
 
-full_cleaned_data |> 
+hunt_4_cleaned_data <- full_cleaned_data |> 
   process_hunt_4()
 
 # Cox Regression
 
-hunt_4_cox_reg_multi <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + 
-                                bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year + age + sex, 
-                              data = hunt_4_cleaned_data)
+hunt_4_cox_reg_multi <- coxph(Surv(follow_up_time_in_years_h4, death_all_cause) ~ pa_hrs_per_week_h4 + 
+                                bp_diastolic_h4 + bp_systolic_h4 + bmi_h4 + packs_of_smoke_per_year_h4 + age + sex, 
+                              data = hunt_4_cleaned_data
+                              
+) |> 
+  broom::tidy(exponentiate = TRUE)
 
-hunt_4_cox_reg_crude <- coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + age,
-                              data = hunt_4_cleaned_data)
+hunt_4_cox_reg_crude <- coxph(Surv(follow_up_time_in_years_h4, death_all_cause) ~ pa_hrs_per_week_h4 + age,
+                              data = hunt_4_cleaned_data
+) |> 
+  broom::tidy(exponentiate = TRUE)
 
 # FOLLOW-UP
 
 # Follow-up time (person-years) for multi-adjusted and crude model
 
-hunt_4_f_up_time_multi <- calculate_follow_up_time_multi(hunt_4_cleaned_data)
+hunt_4_follow_up_time_multi <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data, 
+                                                        covariates = c("age", "pa_hrs_per_week_h4", "follow_up_time_in_years_h4", 
+                                                                       "death_all_cause", "bp_diastolic_h4", "bp_systolic_h4",
+                                                                       "bmi_h4", "packs_of_smoke_per_year_h4", "sex"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date_h4
+)
 
-hunt_4_f_up_time_crude <- calculate_follow_up_time_crude(hunt_4_cleaned_data)
+hunt_4_follow_up_time_crude <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data, 
+                                                        covariates = c("follow_up_time_in_years_h4", "death_all_cause", 
+                                                                       "age", "pa_hrs_per_week_h4"), 
+                                                        end_date_death = end_date_death, 
+                                                        participation_date = participation_date_h4
+)
 
 # SUMMARY STATS FROM MODELS
 

@@ -1,4 +1,4 @@
-## This script contains all the function used for the analyses. The analyses scripts may also contain other functions, but these are smaller.
+## This script contains all the functions used for the analyses. The analyses scripts may also contain other functions, but these are smaller.
 
 # DATA PROCESSING FUNCTIONS
 
@@ -79,16 +79,17 @@ process_hunt_2 <- function(dataframe) {
     # HUNT 2 mutating variables
     
     mutate(
-      pa_minutes_per_week_h2 = case_when(
+      pa_hrs_per_week_h2 = case_when(
         exercise_time_per_week_h2 == "Ingen" ~ 0,
-        exercise_time_per_week_h2 == "Under 1 time" ~ 30,
-        exercise_time_per_week_h2 == "1-2 timer" ~ 90,
-        exercise_time_per_week_h2 == "3 timer eller mer" ~ 210
+        exercise_time_per_week_h2 == "Under 1 time" ~ 0.5,
+        exercise_time_per_week_h2 == "1-2 timer" ~ 1.5,
+        exercise_time_per_week_h2 == "3 timer eller mer" ~ 3.5
       ),
       follow_up_time_in_years_h2 = round(as.numeric(interval(participation_date_h2, end_date_death) / dyears(1)), 1),
-      packs_of_smoke_per_year_h2 = ifelse(is.na(packs_of_smoke_per_year_h2), 0, packs_of_smoke_per_year_h2)
+      packs_of_smoke_per_year_h2 = ifelse(is.na(packs_of_smoke_per_year_h2), 0, packs_of_smoke_per_year_h2),
+      death_all_cause = as.numeric(death_all_cause)
     )
-} # HUNT 2
+}
 
 process_hunt_3 <- function(dataframe) {
   
@@ -188,7 +189,46 @@ process_hunt_4 <- function(dataframe) {
 
 # This function performs a Cox regression and puts it into a tidied format
 
+run_cox_reg_multi <- function(dataframe, strata = NULL, follow_up_time, covariaties) { # Multi-adjusted
+  
+  result <- dataframe |> 
+    group_by({{ strata }}) |> 
+    drop_na({{ strata }}) |> 
+    nest() |> 
+    mutate(test_results = map(.x = data, 
+                              .f = ~ coxph(Surv(follow_up_time, death_all_cause) ~ pa_hrs_per_week +
+                                             bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year +
+                                             age + sex, data =.x) |> 
+                                broom::tidy(conf.int = TRUE, exponentiate = TRUE))
+           
+    ) |> 
+    unnest(test_results) |> 
+    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
+    ungroup()
+  
+  return(result)
+  
+}
 
+run_cox_reg_crude <- function(dataframe, strata = NULL) { # Crude
+  
+  result <- dataframe |> 
+    group_by({{ strata}}) |> # strata needs to be in double curly brackets so R understands it should look inside the dataframe
+    drop_na({{ strata}} ) |> 
+    nest() |> 
+    mutate(test_results = map(.x = data, 
+                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_minutes_per_week + 
+                                             age, data =.x) |> 
+                                broom::tidy(conf.int = TRUE, exponentiate = TRUE))
+           
+    ) |> 
+    unnest(test_results) |>  
+    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
+    ungroup()
+  
+  return(result)
+  
+}
 
 # FOLLOW-UP TIME CALCULATION FUNCTION
 
@@ -197,11 +237,10 @@ process_hunt_4 <- function(dataframe) {
 calculate_follow_up_time <- function(dataframe, covariates, strata = NULL, end_date_death, participation_date) {
   
   dataframe |> 
-    select({{(covariates)}}, {{participation_date}}, {{end_date_death}}) |> 
+    select(({{covariates}}), {{participation_date}}, {{end_date_death}}) |> 
     drop_na() |> 
     mutate(person_years = (end_date_death - {{participation_date}}) / 365) |> 
     summarize(person_years = sum(person_years)) |> 
     pull()
   
 }
-
