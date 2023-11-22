@@ -145,3 +145,17 @@ hunt_4_follow_up_time_crude_socio_strat <- calculate_follow_up_time(dataframe = 
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )
+
+# SUMMARY STATS FROM MODELS
+
+# Multi-adjusted
+
+sum_stats_cox_reg_crude_no_change <- tibble(
+  survey = c("HUNT 1", "HUNT 2", "HUNT 3", "HUNT 4"),
+  number_of_participants = c(35080, 54397, 38456, 44627),
+  num_of_deaths = c(17984, 15362, 4705, 604),
+  person_years_follow_up = c(953768.7, 1161724.2, 486275.2, 119997.5),
+  incidence_rate = (num_of_deaths) / (person_years_follow_up) * 1000,
+)
+
+# Crude

@@ -22,7 +22,9 @@ process_hunt_1_no_change <- function(dataframe) {
       bp_diastolic = bp_dias2_nt1blm,
       bp_systolic = bp_syst2_nt1blm,
       bmi = bmi_nt1blm,
-      packs_of_smoke_per_year = smo_pack_yrs_x_nt1blq2
+      packs_of_smoke_per_year = smo_pack_yrs_x_nt1blq2,
+      alcohol_usage = alc_fl2w_nt1blq2,
+      heart_infarction = car_inf_ev_nt1blq1
       
       # Mutate HUNT 1 variables
       
@@ -68,7 +70,9 @@ process_hunt_2_no_change <- function(dataframe) {
       packs_of_smoke_per_year = smo_pack_yrs_x_nt2blq1,
       bp_systolic = bp_syst_mn23_nt2blm,
       bp_diastolic = bp_dias_mn23_nt2blm,
-      bmi = bmi_nt2blm
+      bmi = bmi_nt2blm,
+      alcohol_usage = alc_tot_unit_w_nt2blq1,
+      heart_infarction = car_inf_ev_nt2blq1
     ) |> 
     
     drop_na( # To be able to use these variables inside the coming mutate function
@@ -109,7 +113,9 @@ process_hunt_3_no_change <- function(dataframe) {
       bp_diastolic = bp_dias_mn23_nt3blm,
       bp_systolic = bp_syst_mn23_nt3blm,
       bmi = bmi_nt3blm,
-      packs_of_smoke_per_year = smo_pack_yrs_x_nt3blq1
+      packs_of_smoke_per_year = smo_pack_yrs_x_nt3blq1,
+      alcohol_usage = alc_tot_unit_w_nt3blq1,
+      heart_infarction = car_inf_ev_nt3blq1
     ) |> 
     
     # Mutate HUNT 3 variables
@@ -156,7 +162,9 @@ process_hunt_4_no_change <- function(dataframe) {
       bp_diastolic = bp_dias_mn23_nt4blm,
       bp_systolic = bp_syst_mn23_nt4blm,
       bmi = bmi_nt4blm,
-      packs_of_smoke_per_year = smo_pack_yrs_x_nt4blq1
+      packs_of_smoke_per_year = smo_pack_yrs_x_nt4blq1,
+      alcohol_usage = alc_tot_unit_w_nt4blq1,
+      heart_infarction = car_inf_ev_nt4blq1
     ) |>
     
     # Mutate HUNT 4 variables
@@ -207,7 +215,9 @@ process_hunt_1_change <- function(dataframe) {
       bp_diastolic_h1 = bp_dias2_nt1blm,
       bp_systolic_h1 = bp_syst2_nt1blm,
       bmi_h1 = bmi_nt1blm,
-      packs_of_smoke_per_year_h1 = smo_pack_yrs_x_nt1blq2
+      packs_of_smoke_per_year_h1 = smo_pack_yrs_x_nt1blq2,
+      alcohol_usage = alc_fl2w_nt1blq2,
+      heart_infarction = car_inf_ev_nt1blq1
       
       # Mutate HUNT 1 variables
       
@@ -253,7 +263,9 @@ process_hunt_2_change <- function(dataframe) {
       packs_of_smoke_per_year_h2 = smo_pack_yrs_x_nt2blq1,
       bp_systolic_h2 = bp_syst_mn23_nt2blm,
       bp_diastolic_h2 = bp_dias_mn23_nt2blm,
-      bmi_h2 = bmi_nt2blm
+      bmi_h2 = bmi_nt2blm,
+      alcohol_usage = alc_tot_unit_w_nt2blq1,
+      heart_infarction = car_inf_ev_nt2blq1
     ) |> 
     
     drop_na( # To be able to use these variables inside the coming mutate function
@@ -294,7 +306,9 @@ process_hunt_3_change <- function(dataframe) {
       bp_diastolic_h3 = bp_dias_mn23_nt3blm,
       bp_systolic_h3 = bp_syst_mn23_nt3blm,
       bmi_h3 = bmi_nt3blm,
-      packs_of_smoke_per_year_h3 = smo_pack_yrs_x_nt3blq1
+      packs_of_smoke_per_year_h3 = smo_pack_yrs_x_nt3blq1,
+      alcohol_usage = alc_tot_unit_w_nt3blq1,
+      heart_infarction = car_inf_ev_nt3blq1
     ) |> 
     
     # Mutate HUNT 3 variables
@@ -341,7 +355,9 @@ process_hunt_4_change <- function(dataframe) {
       bp_diastolic_h4 = bp_dias_mn23_nt4blm,
       bp_systolic_h4 = bp_syst_mn23_nt4blm,
       bmi_h4 = bmi_nt4blm,
-      packs_of_smoke_per_year_h4 = smo_pack_yrs_x_nt4blq1
+      packs_of_smoke_per_year_h4 = smo_pack_yrs_x_nt4blq1,
+      alcohol_usage = alc_tot_unit_w_nt4blq1,
+      heart_infarction = car_inf_ev_nt4blq1
     ) |>
     
     # Mutate HUNT 4 variables
@@ -383,7 +399,7 @@ run_cox_reg_multi <- function(dataframe, strata) {
     mutate(test_results = map(.x = data, 
                               .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week +
                                              bp_diastolic + bp_systolic + bmi + packs_of_smoke_per_year +
-                                             age + sex, data =.x) |> 
+                                             age + alcohol_usage + heart_infarction, sex, data =.x) |> 
                                 broom::tidy(conf.int = TRUE, exponentiate = TRUE))
            
     ) |> 
