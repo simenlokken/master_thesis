@@ -76,16 +76,19 @@ hunt_4_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_4_cleaned_data_occu_st
 # HUNT 1, multi-adjusted and crude
 
 hunt_1_follow_up_time_multi_occu_strat <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data_occu_strat, strata = occupational_pa,
-                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
-                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                   covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                  "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                  "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                                  "heart_infarction"), 
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )
 
 hunt_1_follow_up_time_crude_occu_strat <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data_occu_strat, strata = occupational_pa,
-                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
-                                                                                   "death_all_cause"), 
+                                                                   covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                                   "heart_infarction"),
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )
@@ -93,9 +96,10 @@ hunt_1_follow_up_time_crude_occu_strat <- calculate_follow_up_time(dataframe = h
 # HUNT 2, multi-adjusted and crude
 
 hunt_2_follow_up_time_multi_occu_strat <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data_socio_strat, strata = occupational_pa,
-                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
-                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                   covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                  "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                  "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                                  "heart_infarction"),
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )
@@ -110,9 +114,10 @@ hunt_2_follow_up_time_crude_occu_strat <- calculate_follow_up_time(dataframe = h
 # HUNT 3, multi-adjusted and crude
 
 hunt_3_follow_up_time_multi_occu_strat <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data_occu_strat, strata = occupational_pa,
-                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
-                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                   covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                  "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                  "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                                  "heart_infarction"),
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )
@@ -127,9 +132,10 @@ hunt_3_follow_up_time_crude_occu_strat <- calculate_follow_up_time(dataframe = h
 # HUNT 4, multi-adjusted and crude
 
 hunt_4_follow_up_time_multi_occu_strat <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data_occu_strat, strata = occupational_pa,
-                                                                    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
-                                                                                   "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                   covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
+                                                                                  "death_all_cause", "bp_diastolic", "bp_systolic",
+                                                                                  "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                                  "heart_infarction"),
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )

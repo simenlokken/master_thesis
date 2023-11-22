@@ -83,7 +83,8 @@ hunt_4_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_4_cleaned_data_socio_
 hunt_1_follow_up_time_multi_socio_strat <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data_socio_strat, strata = socioeconomic_class,
                                                         covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
                                                                        "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                       "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                       "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                       "heart_infarction"),
                                                         end_date_death = end_date_death, 
                                                         participation_date = participation_date
 )
@@ -100,7 +101,8 @@ hunt_1_follow_up_time_crude_socio_strat <- calculate_follow_up_time(dataframe = 
 hunt_2_follow_up_time_multi_socio_strat <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data_socio_strat, strata = socioeconomic_class,
                                                                     covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
                                                                                    "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                                   "heart_infarction"),
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )
@@ -117,7 +119,8 @@ hunt_2_follow_up_time_crude_socio_strat <- calculate_follow_up_time(dataframe = 
 hunt_3_follow_up_time_multi_socio_strat <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data_socio_strat, strata = socioeconomic_class,
                                                                     covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
                                                                                    "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                                   "heart_infarction"),
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )
@@ -134,7 +137,8 @@ hunt_3_follow_up_time_crude_socio_strat <- calculate_follow_up_time(dataframe = 
 hunt_4_follow_up_time_multi_socio_strat <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data_socio_strat, strata = socioeconomic_class,
                                                                     covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
                                                                                    "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                                   "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                                   "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                                   "heart_infarction"),
                                                                     end_date_death = end_date_death, 
                                                                     participation_date = participation_date
 )

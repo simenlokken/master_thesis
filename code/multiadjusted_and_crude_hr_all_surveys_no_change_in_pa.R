@@ -29,7 +29,8 @@ hunt_1_cox_reg_crude <- run_cox_reg_crude(hunt_1_cleaned_data, strata = NULL)
 hunt_1_follow_up_time_multi <- calculate_follow_up_time(dataframe = hunt_1_cleaned_data, 
                                                         covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
                                                                        "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                       "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                       "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                       "heart_infarction"), 
                                                         end_date_death = end_date_death, 
                                                         participation_date = participation_date
 )
@@ -50,7 +51,7 @@ hunt_2_cleaned_data <- full_cleaned_data |>
 
 # Multi-adjusted model, adjusted for BP, BMI, smoking (cont), age and sex
 
-hunt_2_cox_reg_multi <- run_cox_reg_crude(hunt_2_cleaned_data, strata = NULL)
+hunt_2_cox_reg_multi <- run_cox_reg_multi(hunt_2_cleaned_data, strata = NULL)
 
 # Crude model
 
@@ -63,7 +64,8 @@ hunt_2_cox_reg_crude <- run_cox_reg_crude(hunt_2_cleaned_data, strata = NULL)
 hunt_2_follow_up_time_multi <- calculate_follow_up_time(dataframe = hunt_2_cleaned_data, 
                                                         covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
                                                                        "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                       "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                       "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                       "heart_infarction"), 
                                                         end_date_death = end_date_death, 
                                                         participation_date = participation_date
 )
@@ -97,7 +99,8 @@ hunt_3_cox_reg_crude <- run_cox_reg_crude(hunt_3_cleaned_data, strata = NULL)
 hunt_3_follow_up_time_multi <- calculate_follow_up_time(dataframe = hunt_3_cleaned_data, 
                                                         covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
                                                                        "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                       "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                       "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                       "heart_infarction"), 
                                                         end_date_death = end_date_death, 
                                                         participation_date = participation_date
 )
@@ -131,7 +134,8 @@ hunt_4_cox_reg_crude <- run_cox_reg_crude(hunt_4_cleaned_data, strata = NULL)
 hunt_4_follow_up_time_multi <- calculate_follow_up_time(dataframe = hunt_4_cleaned_data, 
                                                         covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", 
                                                                        "death_all_cause", "bp_diastolic", "bp_systolic",
-                                                                       "bmi", "packs_of_smoke_per_year", "sex"), 
+                                                                       "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage",
+                                                                       "heart_infarction"), 
                                                         end_date_death = end_date_death, 
                                                         participation_date = participation_date
 )
