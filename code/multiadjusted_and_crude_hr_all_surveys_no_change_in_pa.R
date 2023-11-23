@@ -69,41 +69,7 @@ hunt_4_cox_reg_crude <- run_cox_reg_crude(hunt_4_cleaned_data, strata = NULL)
 
 # SUMMARY STATS FROM MODELS
 
-# Functions (names are descriptive)
-
-calculate_num_of_participants <- function(dataframes, covariates) {
-  for (dataframe in dataframes) {
-    print(
-      get(dataframe) %>% 
-        select(all_of(covariates)) %>% 
-        drop_na() %>% 
-        count()
-    )
-  }
-}
-
-calculate_num_of_deaths <- function(dataframes, covariates) {
-  for (dataframe in dataframes) {
-    print(
-      get(dataframe) %>% 
-        select(all_of(covariates)) %>% 
-        drop_na() %>% 
-        filter(death_all_cause == 2) |> # Death is coded as 2
-        count()
-    )
-  }
-}
-
-calculate_person_years_follow_up <- function(dataframes, covariates) {
-  for (dataframe in dataframes) {
-    print(
-      get(dataframe) |> 
-        select(all_of(covariates)) %>% 
-        drop_na() %>% 
-        summarise(person_years = sum(follow_up_time_in_years))
-    )
-  }
-}
+# Functions are sourced in at the top of the script
 
 # Multi-adjusted 
 

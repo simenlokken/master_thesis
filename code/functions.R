@@ -492,13 +492,15 @@ calculate_num_of_participants_strat <- function(dataframes, covariates, strata) 
 
 # Function for calculating stratified follow-up time
 
-calculate_person_years_follow_up_strat <- function(dataframes, covariates) {
+calculate_person_years_follow_up_strat <- function(dataframes, covariates, strata) {
   for (dataframe in dataframes) {
-    print(
-      get(dataframe) |> 
+      result <- get(dataframe) |> 
         select(all_of(covariates)) %>% 
         drop_na() %>% 
         summarise(person_years = sum(follow_up_time_in_years))
-    )
+      
+      print(
+        paste("Dataset:", dataframe, "class:", strata, result$person_years)
+      )
   }
 }
