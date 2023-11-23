@@ -149,22 +149,95 @@ hunt_4_follow_up_time_crude <- calculate_follow_up_time(dataframe = hunt_4_clean
 
 # SUMMARY STATS FROM MODELS
 
+# Functions (names are descriptive)
+
+calculate_num_of_participants <- function(dataframes, covariates) {
+  for (dataframe in dataframes) {
+    print(
+      get(dataframe) %>% 
+        select(all_of(covariates)) %>% 
+        drop_na() %>% 
+        count()
+    )
+  }
+}
+
+calculate_num_of_deaths <- function(dataframes, covariates) {
+  for (dataframe in dataframes) {
+    print(
+      get(dataframe) %>% 
+        select(all_of(covariates)) %>% 
+        drop_na() %>% 
+        filter(death_all_cause == 2) |> # Death is coded as 2
+        count()
+    )
+  }
+}
+
+calculate_person_years_follow_up <- function(dataframes, covariates) {
+  for (dataframe in dataframes) {
+    print(
+      get(dataframe) |> 
+        select(all_of(covariates)) %>% 
+        drop_na() %>% 
+        summarise(person_years = sum(follow_up_time_in_years))
+    )
+  }
+}
+
+# Multi-adjusted 
+
+calculate_num_of_participants(
+  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"), 
+  covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                 "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction")
+)
+
+calculate_num_of_deaths(
+  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"),
+  covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                 "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction")
+)
+
+calculate_person_years_follow_up(
+  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"), 
+  covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                 "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction")
+)
+
+# Crude
+
+calculate_num_of_participants(
+  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"),
+  covariates = c("follow_up_time_in_years", "death_all_cause", "age", "pa_hrs_per_week")
+)
+
+calculate_num_of_deaths(
+  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"),
+  covariates = c("follow_up_time_in_years", "death_all_cause", "age", "pa_hrs_per_week")
+)
+
+calculate_person_years_follow_up(
+  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"), 
+  covariates = c("follow_up_time_in_years", "death_all_cause", "age", "pa_hrs_per_week")
+)
+
 # Multi-adjusted model
 
-sum_stats_cox_reg_multi_no_change <- tibble(
+tibble(
   survey = c("HUNT 1", "HUNT 2", "HUNT 3", "HUNT 4"),
-  number_of_participants = c(14903,27282, 16964, 19069),
-  num_of_deaths = c(6835,7776, 2013, 319),
-  person_years_follow_up = c(426751.8, 584618.3, 214476.6, 51191.76),
+  number_of_participants = c(33926,50931, 36118, 38430),
+  num_of_deaths = c(17011, 13992, 4024, 405),
+  person_years_follow_up = c(931806, 1093581, 458556, 102768),
   incidence_rate = (num_of_deaths) / (person_years_follow_up) * 1000,
 )
 
 # Crude model
 
-sum_stats_cox_reg_crude_no_change <- tibble(
+tibble(
   survey = c("HUNT 1", "HUNT 2", "HUNT 3", "HUNT 4"),
   number_of_participants = c(35080, 54397, 38456, 44627),
   num_of_deaths = c(17984, 15362, 4705, 604),
-  person_years_follow_up = c(953768.7, 1161724.2, 486275.2, 119997.5),
+  person_years_follow_up = c(953010, 1160780, 485785, 119545),
   incidence_rate = (num_of_deaths) / (person_years_follow_up) * 1000,
 )

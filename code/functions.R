@@ -1,4 +1,5 @@
 ## This script contains all the functions used for the analyses. The analyses scripts may also contain other functions, but these are smaller.
+## A short explainer will accompany the function in the script.
 
 # DATA PROCESSING FUNCTIONS FOR NO CHANGE IN LTPA
 
@@ -386,9 +387,9 @@ process_hunt_4_change <- function(dataframe) {
   
 }
 
-# COX REGRESSION FUNCTION
+# COX REGRESSION FUNCTIONs
 
-# This function performs a Cox regression and puts it into a tidied format
+# These functions performs a Cox regression and puts it into a tidied format
 
 run_cox_reg_multi <- function(dataframe, strata) {
   

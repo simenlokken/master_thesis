@@ -4,6 +4,8 @@
 
 library(tidyverse)
 
+source("code/functions.R")
+
 # PLOT HISTOGRAMS OVER ALL CONTINUOUS COVARIATES
 
 # Histogram function
