@@ -1,5 +1,5 @@
 ## This script contains all the functions used for the analyses. The analyses scripts may also contain other functions, but these are smaller.
-## A short explainer will accompany the function in the script.
+## A short explanation will then accompany the function in the script.
 
 # DATA PROCESSING FUNCTIONS FOR NO CHANGE IN LTPA
 
@@ -387,7 +387,7 @@ process_hunt_4_change <- function(dataframe) {
   
 }
 
-# COX REGRESSION FUNCTIONs
+# COX REGRESSION FUNCTIONS
 
 # These functions performs a Cox regression and puts it into a tidied format
 
@@ -432,17 +432,73 @@ run_cox_reg_crude <- function(dataframe, strata) {
   
 }
 
-# FOLLOW-UP TIME CALCULATION FUNCTION
+# GENERAL FUNCTIONS FOR CALCULATING FOLLOW-UP TIME, NUMBER OF PARTICIPANTS ETC.
 
-# This function performs a follow-up time calculation
+# Function for calculating number of participants
 
-calculate_follow_up_time <- function(dataframe, covariates, strata = NULL, end_date_death, participation_date) {
-  
-  dataframe |> 
-    select(({{covariates}}), {{participation_date}}, {{end_date_death}}) |> 
-    drop_na() |> 
-    mutate(person_years = (end_date_death - {{participation_date}}) / 365) |> 
-    summarize(person_years = sum(person_years)) |> 
-    pull()
-  
+calculate_num_of_participants <- function(dataframes, covariates) {
+  for (dataframe in dataframes) {
+    print(
+      get(dataframe) %>% 
+        select(all_of(covariates)) %>% 
+        drop_na() %>% 
+        count()
+    )
+  }
+}
+
+# Function for calculating number of deaths
+
+calculate_num_of_deaths <- function(dataframes, covariates) {
+  for (dataframe in dataframes) {
+    print(
+      get(dataframe) %>% 
+        select(all_of(covariates)) %>% 
+        drop_na() %>% 
+        filter(death_all_cause == 2) |> # Death is coded as 2
+        count()
+    )
+  }
+}
+
+# Function for calculating follow-up time
+
+calculate_person_years_follow_up <- function(dataframes, covariates) {
+  for (dataframe in dataframes) {
+    print(
+      get(dataframe) |> 
+        select(all_of(covariates)) %>% 
+        drop_na() %>% 
+        summarise(person_years = sum(follow_up_time_in_years))
+    )
+  }
+}
+
+# Function for calculating stratified number of participants
+
+calculate_num_of_participants_strat <- function(dataframes, covariates, strata) {
+  for (dataframe in dataframes) {
+    result <- get(dataframe) %>% 
+      select(all_of(covariates)) %>%
+      filter(strata == !!class) |> 
+      drop_na() %>% 
+      count()
+    
+    print(
+      paste("Dataset:", dataframe, "class:", strata, result$n)
+    )
+  }
+}
+
+# Function for calculating stratified follow-up time
+
+calculate_person_years_follow_up_strat <- function(dataframes, covariates) {
+  for (dataframe in dataframes) {
+    print(
+      get(dataframe) |> 
+        select(all_of(covariates)) %>% 
+        drop_na() %>% 
+        summarise(person_years = sum(follow_up_time_in_years))
+    )
+  }
 }
