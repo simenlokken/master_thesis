@@ -484,6 +484,28 @@ calculate_num_of_participants_strat <- function(dataframes, covariates, classes,
     
     for (class in classes) {
       result <- data |> 
+        filter({{ stratifier }} == class) |> 
+        select(all_of(covariates)) |> 
+        drop_na() |> 
+        count()
+      print(
+        paste(
+          paste("Dataset:", dataframe, "class:", class, "number of participants:", result$n)
+        )
+      )
+    }
+  }
+}
+
+# Function for calculating stratified follow-up time
+
+calculate_person_years_follow_up_strat <- function(dataframes, covariates, classes, stratifier) {
+  
+  for (dataframe in dataframes) {
+    data <- get(dataframe)
+    
+    for (class in classes) {
+      result <- data |> 
         filter({{ stratifier }} == class) |>
         select(all_of(covariates)) |> 
         drop_na() |> 
@@ -493,21 +515,5 @@ calculate_num_of_participants_strat <- function(dataframes, covariates, classes,
         paste("Dataset:", dataframe, "class:", class, "person_years:", result$person_years)
       )
     }
-  }
-}
-
-# Function for calculating stratified follow-up time
-
-calculate_person_years_follow_up_strat <- function(dataframes, covariates, strata) {
-  for (dataframe in dataframes) {
-      result <- get(dataframe) |> 
-        select(all_of(covariates)) %>% 
-        filter(socioeconomic_class == class) |> 
-        drop_na() %>% 
-        summarise(person_years = sum(follow_up_time_in_years))
-      
-      print(
-        paste("Dataset:", dataframe, "class:", strata, result$person_years)
-      )
   }
 }

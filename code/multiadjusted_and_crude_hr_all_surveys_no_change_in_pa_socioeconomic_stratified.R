@@ -78,42 +78,43 @@ hunt_4_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_4_cleaned_data_socio_
 
 # SUMMARY STATS FROM MODELS
 
-# Multi-adjusted model
+dataframes_socio_strat <- c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat")
 
-socioeconomic_class <- c("low", "medium", "high")
+multi_adjusted_covariates_socio_strat <- c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                                           "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "socioeconomic_class")
 
-for (class in socioeconomic_class) {
-    calculate_num_of_participants_strat(
-      dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"), 
-      covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
-                     "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "socioeconomic_class"),
-      strata = class
-    )
-}
+crude_covariates_socio_strat <- c("pa_hrs_per_week", "age", "follow_up_time_in_years", "death_all_cause", "socioeconomic_class")
 
-for (class in socioeconomic_class) {
-  calculate_person_years_follow_up_strat(
-    dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"),
-    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
-                   "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "socioeconomic_class"),
-    strata = class
-  )
-}
+socioeconomic_classes <- c("low", "medium", "high")
 
-# Crude model
+# Multi-adjusted
 
-for (class in socioeconomic_class) {
-  calculate_num_of_participants_strat(
-    dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"), 
-    covariates = c("pa_hrs_per_week", "age", "follow_up_time_in_years", "death_all_cause", "socioeconomic_class"),
-    strata = class
-  )
-}
+calculate_num_of_participants_strat(
+  dataframes = dataframes_socio_strat,
+  covariates = multi_adjusted_covariates_socio_strat,
+  classes = socioeconomic_classes,
+  stratifier = socioeconomic_class
+)
 
-for (class in socioeconomic_class) {
-  calculate_person_years_follow_up_strat(
-    dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"),
-    covariates = c("pa_hrs_per_week", "age", "follow_up_time_in_years", "death_all_cause", "socioeconomic_class"),
-    strata = class
-  )
-}
+calculate_person_years_follow_up_strat(
+  dataframes = dataframes_socio_strat,
+  covariates = multi_adjusted_covariates_socio_strat,
+  classes = socioeconomic_classes,
+  stratifier = socioeconomic_class
+)
+
+# Crude
+
+calculate_num_of_participants_strat(
+  dataframes = dataframes_socio_strat,
+  covariates = crude_covariates_socio_strat,
+  classes = socioeconomic_classes,
+  stratifier = socioeconomic_class
+)
+
+calculate_person_years_follow_up_strat(
+  dataframes = dataframes_socio_strat,
+  covariates = crude_covariates_socio_strat,
+  classes = socioeconomic_classes,
+  stratifier = socioeconomic_class
+)
