@@ -80,14 +80,12 @@ hunt_4_cox_reg_crude_socio_strat <- run_cox_reg_crude(hunt_4_cleaned_data_socio_
 
 dataframes_socio_strat <- c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat")
 
-multi_adjusted_covariates_socio_strat <- c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
-                                           "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "socioeconomic_class")
-
-crude_covariates_socio_strat <- c("pa_hrs_per_week", "age", "follow_up_time_in_years", "death_all_cause", "socioeconomic_class")
-
 socioeconomic_classes <- c("low", "medium", "high")
 
 # Multi-adjusted
+
+multi_adjusted_covariates_socio_strat <- c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                                           "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "socioeconomic_class")
 
 calculate_num_of_participants_strat(
   dataframes = dataframes_socio_strat,
@@ -104,6 +102,8 @@ calculate_person_years_follow_up_strat(
 )
 
 # Crude
+
+crude_covariates_socio_strat <- c("pa_hrs_per_week", "age", "follow_up_time_in_years", "death_all_cause", "socioeconomic_class")
 
 calculate_num_of_participants_strat(
   dataframes = dataframes_socio_strat,

@@ -69,43 +69,47 @@ hunt_4_cox_reg_crude <- run_cox_reg_crude(hunt_4_cleaned_data, strata = NULL)
 
 # SUMMARY STATS FROM MODELS
 
+dataframes <- c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data")
+
 # Functions are sourced in at the top of the script
 
 # Multi-adjusted 
 
+multi_adjusted_covariates <- c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                               "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction")
+
 calculate_num_of_participants(
-  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"), 
-  covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
-                 "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction")
+  dataframes = dataframes,
+  covariates = multi_adjusted_covariates
 )
 
 calculate_num_of_deaths(
-  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"),
-  covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
-                 "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction")
+  dataframes = dataframes,
+  covariates = multi_adjusted_covariates
 )
 
 calculate_person_years_follow_up(
-  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"), 
-  covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
-                 "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction")
+  dataframes = dataframes, 
+  covariates = multi_adjusted_covariates
 )
 
 # Crude
 
+crude_covariates <- c("follow_up_time_in_years", "death_all_cause", "age", "pa_hrs_per_week")
+
 calculate_num_of_participants(
-  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"),
-  covariates = c("follow_up_time_in_years", "death_all_cause", "age", "pa_hrs_per_week")
+  dataframes = dataframes,
+  covariates = crude_covariates
 )
 
 calculate_num_of_deaths(
-  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"),
-  covariates = c("follow_up_time_in_years", "death_all_cause", "age", "pa_hrs_per_week")
+  dataframes = dataframes,
+  covariates = crude_covariates
 )
 
 calculate_person_years_follow_up(
-  dataframes = c("hunt_1_cleaned_data", "hunt_2_cleaned_data", "hunt_3_cleaned_data", "hunt_4_cleaned_data"), 
-  covariates = c("follow_up_time_in_years", "death_all_cause", "age", "pa_hrs_per_week")
+  dataframes = dataframes,
+  covariates = crude_covariates
 )
 
 # Multi-adjusted model

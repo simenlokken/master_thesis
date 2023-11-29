@@ -73,16 +73,14 @@ hunt_4_cox_reg_crude_occu_strat <- run_cox_reg_crude(hunt_4_cleaned_data_occu_st
 
 # SUMMARY STATS FROM MODELS
 
-multi_adjusted_covariates_occu_strat <- c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
-                               "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "occupational_pa")
-
-crude_covariates_occu_strat <- c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "occupational_pa")
-
 dataframes_occu_strat <- c("hunt_1_cleaned_data_occu_strat", "hunt_2_cleaned_data_occu_strat", "hunt_3_cleaned_data_occu_strat", "hunt_4_cleaned_data_occu_strat")
 
 occupational_pa_classes <- c("low", "high")
 
 # Multi-adjusted
+
+multi_adjusted_covariates_occu_strat <- c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                                          "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "occupational_pa")
 
 calculate_num_of_participants_strat(
   dataframes = dataframes_occu_strat,
@@ -99,6 +97,8 @@ calculate_person_years_follow_up_strat(
 )
 
 # Crude
+
+crude_covariates_occu_strat <- c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "occupational_pa")
 
 calculate_num_of_participants_strat(
   dataframes = dataframes_occu_strat,
