@@ -253,14 +253,13 @@ process_hunt_2_change <- function(dataframe) {
     
     # Select relevant variables
     
-    select(contains(match = "nt2"), age, sex, death_all, end_date_death) |>
+    select(contains(match = "nt2"), age, sex, end_date_death) |>
     
     # HUNT 2 renaming of variables
     
     rename(
       exercise_time_per_week_h2 = exe_lig_du_ly_nt2blq1,
       participation_date_h2 = part_dat_nt2blq1,
-      death_all_cause = death_all,
       packs_of_smoke_per_year_h2 = smo_pack_yrs_x_nt2blq1,
       bp_systolic_h2 = bp_syst_mn23_nt2blm,
       bp_diastolic_h2 = bp_dias_mn23_nt2blm,
@@ -295,7 +294,7 @@ process_hunt_3_change <- function(dataframe) {
     
     # Select relevant variables
     
-    select(contains(match = "nt3"), age, sex, death_all, end_date_death) |>
+    select(contains(match = "nt3"), age, sex, end_date_death) |>
     
     # Rename HUNT 3 variables
     
@@ -303,7 +302,6 @@ process_hunt_3_change <- function(dataframe) {
       exercise_duration_h3 = exe_du_nt3blq1,
       exercise_frequency_per_week_h3 = exe_f_nt3blq1,
       participation_date_h3 = part_dat_nt3blq1,
-      death_all_cause = death_all,
       bp_diastolic_h3 = bp_dias_mn23_nt3blm,
       bp_systolic_h3 = bp_syst_mn23_nt3blm,
       bmi_h3 = bmi_nt3blm,
@@ -344,20 +342,19 @@ process_hunt_4_change <- function(dataframe) {
     
     # Select relevant variables
     
-    select(contains(match = "nt4"), age, sex, death_all, end_date_death) |>
+    select(contains(match = "nt4"), age, sex, end_date_death) |>
     
     # Rename HUNT 4 variables
     
     rename(
       exercise_duration_h4 = exe_du_nt4blq1,
       exercise_frequency_per_week_h4 = exe_f_nt4blq1,
-      death_all_cause = death_all,
       participation_date_h4 = part_dat_nt4blq1,
       bp_diastolic_h4 = bp_dias_mn23_nt4blm,
       bp_systolic_h4 = bp_syst_mn23_nt4blm,
       bmi_h4 = bmi_nt4blm,
       packs_of_smoke_per_year_h4 = smo_pack_yrs_x_nt4blq1,
-      alcohol_usage = alc_tot_unit_w_nt4blq1,
+      alcohol_usage_h4 = alc_tot_unit_w_nt4blq1,
       heart_infarction = car_inf_ev_nt4blq1
     ) |>
     
@@ -517,3 +514,5 @@ calculate_person_years_follow_up_strat <- function(dataframes, covariates, class
     }
   }
 }
+
+
