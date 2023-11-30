@@ -100,8 +100,18 @@ dataframes <- list(hunt_1_cleaned_data, hunt_2_cleaned_data, hunt_3_cleaned_data
 
 covariate <- "follow_up_time_in_years"
 
-histograms <- plot_histograms(dataframes, covariate, bins = 30)
+histograms_follow_up <- plot_histograms(dataframes, covariate, bins = 30)
 
-combined_plots <- wrap_plots(histograms, ncol = 1)
+combined_plots <- wrap_plots(histograms_follow_up, ncol = 1)
 
 combined_plots
+
+# Plotting age distribution for all surveys
+
+covariate <- "age"
+
+histograms_age <- plot_histograms(dataframes, covariate, bins = 30)
+
+combined_plots_age <- wrap_plots(histograms_age, ncol = 1, "free_x")
+
+combined_plots_age
