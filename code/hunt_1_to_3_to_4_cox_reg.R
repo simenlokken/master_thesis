@@ -1,18 +1,14 @@
-## This script contains the analyses for change in PA across HUNT 1, HUNT 2, HUNT 3 and HUNT 4.
+## This script contains the analyses for change in PA across HUNT 1, HUNT 3 and UNT 4.
 
 source("code/functions.R")
 
 library(tidyverse)
 library(survival)
 
-# DATA PROCESSING FOR HUNT 1, 2, 3 AND 4
+# DATA PROCESSING FOR HUNT 1, 3 AND 4
 
-# This data is filtered so that all participants have data on PA, death, BP, BMI, smoking, heart infarction and alcohol usage for three
-# HUNT surveys. Note that heart infarction history is only filtered out in HUNT 4 because if you have reported in earlier, you will also
-# report it in HUNT 4.
-
-hunt_1_2_3_4_cleaned_change_in_pa <- full_cleaned_data |> 
-  select(contains(match = c("nt1", "nt2", "nt3", "nt4")), age, sex, death_all, end_date_death) |>
+hunt_1_3_4_cleaned_change_in_pa <- full_cleaned_data |> 
+  select(contains(match = c("nt1", "nt3", "nt4")), age, sex, death_all, end_date_death) |>
   
   # Process HUNT 1 data, change names and mutate necessary variables
   
@@ -39,18 +35,6 @@ hunt_1_2_3_4_cleaned_change_in_pa <- full_cleaned_data |>
     pa_hrs_per_week_h1 = (minutes_duration_each_exercise_bout_h1 * frequency_per_week_h1) / 60,
     follow_up_time_in_years_h1 = round(as.numeric(interval(participation_date_h1, end_date_death) / dyears(1)), 1)
   ) |> 
-  
-  # Process HUNT 2, rename and mutate variables
-  
-  rename(exercise_time_per_week_h2 = exe_lig_du_ly_nt2blq1) |> 
-  drop_na(exercise_time_per_week_h2) |> 
-  mutate(
-    pa_hrs_per_week_h2 = case_when(
-      exercise_time_per_week_h2 == "Ingen" ~ 0,
-      exercise_time_per_week_h2 == "Under 1 time" ~ 0.5,
-      exercise_time_per_week_h2 == "1-2 timer" ~ 1.5,
-      exercise_time_per_week_h2 == "3 timer eller mer" ~ 3.5)
-    ) |> 
   
   # Process HUNT 3 data, change names and mutate necessary variables
   
@@ -100,7 +84,7 @@ hunt_1_2_3_4_cleaned_change_in_pa <- full_cleaned_data |>
   
   # Select variables of interest for the analysis
   
-  select(contains(match = c("h1", "h2", "h3", "h4")), age, sex, death_all_cause, end_date_death) |> 
+  select(contains(match = c("h1", "h3", "h4")), age, sex, death_all_cause, end_date_death) |> 
   
   # Construct a follow-up time variable for all surveys, i.e., by subtracting end date from the participation date in HUNT 1
   
