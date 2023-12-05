@@ -9,7 +9,7 @@ process_hunt_1_no_change <- function(dataframe) {
   
   dataframe |> 
     
-    # Select all variables 
+    # Select all variables of interest
     
     select(contains(match = "nt1"), age, sex, death_all, end_date_death) |> 
     
@@ -20,38 +20,37 @@ process_hunt_1_no_change <- function(dataframe) {
       exercise_frequency_per_week = exe_f_nt1blq2,
       death_all_cause = death_all,
       participation_date = part_dat_nt1blq1,
-      bp_diastolic = bp_dias2_nt1blm,
       bp_systolic = bp_syst2_nt1blm,
       bmi = bmi_nt1blm,
-      packs_of_smoke_per_year = smo_pack_yrs_x_nt1blq2,
-      alcohol_usage = alc_fl2w_nt1blq2,
-      heart_infarction = car_inf_ev_nt1blq1
-      
+      smo_status = smo_stat_nt1blq2,
+      alcohol_usage = alc_fl2w_nt1blq2
+    ) |> 
+    
       # Mutate HUNT 1 variables
-      
-    ) |> 
-    drop_na( # To be able to use these variables inside the coming mutate function
-      exercise_duration, exercise_frequency_per_week, age, death_all_cause,
-      sex, participation_date
-    ) |> 
+    
     mutate(
       minutes_duration_each_exercise_bout = case_when(
         exercise_duration == "Mindre enn 15 minutter" ~ 7.5,
         exercise_duration == "16-30 minutter" ~ 22.5,
         exercise_duration == "30 minutter-1 time" ~ 45,
-        exercise_duration == "Mer enn 1 time" ~ 75
+        exercise_duration == "Mer enn 1 time" ~ 75,
+        TRUE ~ 0
       ),
       frequency_per_week = case_when(
         exercise_frequency_per_week == "En gang i uka" ~ 1,
         exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5,
-        exercise_frequency_per_week == "Omtrent hver dag" ~ 5
+        exercise_frequency_per_week == "Omtrent hver dag" ~ 5,
+        TRUE ~ 0
       ),
       pa_hrs_per_week = (minutes_duration_each_exercise_bout * frequency_per_week) / 60,
       follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
-      death_all_cause = as.numeric(death_all_cause), # Surv() input needs to be numeric
-      packs_of_smoke_per_year = ifelse(is.na(packs_of_smoke_per_year), 0, packs_of_smoke_per_year) # Compute all smoking NA's to 0
-    )
-  
+      death_all_cause = as.numeric(death_all_cause) # Surv() input needs to be numeric
+    ) |> 
+    
+    # Drop all NA's
+      
+    drop_na(pa_hrs_per_week, age, sex, death_all_cause, participation_date)
+    
 }
 
 process_hunt_2_no_change <- function(dataframe) {
@@ -65,35 +64,40 @@ process_hunt_2_no_change <- function(dataframe) {
     # HUNT 2 renaming of variables
     
     rename(
-      exercise_time_per_week = exe_lig_du_ly_nt2blq1,
+      exercise_time_per_week_high_int = exe_har_du_ly_nt2blq1,
+      exercise_time_per_week_low_int = exe_lig_du_ly_nt2blq1,
       participation_date = part_dat_nt2blq1,
       death_all_cause = death_all,
-      packs_of_smoke_per_year = smo_pack_yrs_x_nt2blq1,
+      smo_status = smo_stat_nt2blq1,
       bp_systolic = bp_syst_mn23_nt2blm,
-      bp_diastolic = bp_dias_mn23_nt2blm,
       bmi = bmi_nt2blm,
       alcohol_usage = alc_tot_unit_w_nt2blq1,
-      heart_infarction = car_inf_ev_nt2blq1
     ) |> 
     
-    drop_na( # To be able to use these variables inside the coming mutate function
-      exercise_time_per_week, age, death_all_cause,
-      sex, participation_date
-    ) |> 
-    
-    # HUNT 2 mutating variables
+    # Mutate HUNT 2 variables
     
     mutate(
-      pa_hrs_per_week = case_when(
-        exercise_time_per_week == "Ingen" ~ 0,
-        exercise_time_per_week == "Under 1 time" ~ 0.5,
-        exercise_time_per_week == "1-2 timer" ~ 1.5,
-        exercise_time_per_week == "3 timer eller mer" ~ 3.5
-      ),
-      follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
-      packs_of_smoke_per_year = ifelse(is.na(packs_of_smoke_per_year), 0, packs_of_smoke_per_year),
-      death_all_cause = as.numeric(death_all_cause)
-    )
+     exercise_time_per_week_low_int = case_when(
+       exercise_time_per_week_low_int == "Ingen" ~ 0,
+       exercise_time_per_week_low_int == "Under 1 time" ~ 0.5,
+       exercise_time_per_week_low_int == "1-2 timer" ~ 1.5,
+       exercise_time_per_week_low_int == "3 timer eller mer" ~ 3.5,
+       TRUE ~ 0),
+     exercise_time_per_week_high_int = case_when(
+       exercise_time_per_week_high_int == "Ingen" ~ 0,
+       exercise_time_per_week_high_int == "Under 1 time" ~ 0.5,
+       exercise_time_per_week_high_int == "1-2 timer" ~ 1.5,
+       exercise_time_per_week_high_int == "3 timer eller mer" ~ 3.5,
+       TRUE ~ 0),
+     pa_hrs_per_week = exercise_time_per_week_low_int + exercise_time_per_week_high_int,
+     follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
+     death_all_cause = as.numeric(death_all_cause)
+    ) |> 
+    
+   # Drop NA's
+    
+    drop_na(pa_hrs_per_week, age, death_all_cause, participation_date) 
+
 }
 
 process_hunt_3_no_change <- function(dataframe) {
@@ -111,37 +115,34 @@ process_hunt_3_no_change <- function(dataframe) {
       exercise_frequency_per_week = exe_f_nt3blq1,
       participation_date = part_dat_nt3blq1,
       death_all_cause = death_all,
-      bp_diastolic = bp_dias_mn23_nt3blm,
       bp_systolic = bp_syst_mn23_nt3blm,
       bmi = bmi_nt3blm,
-      packs_of_smoke_per_year = smo_pack_yrs_x_nt3blq1,
-      alcohol_usage = alc_tot_unit_w_nt3blq1,
-      heart_infarction = car_inf_ev_nt3blq1
+      smo_status = smo_stat_nt3blq1,
+      alcohol_usage = alc_tot_unit_w_nt3blq1
     ) |> 
     
     # Mutate HUNT 3 variables
     
-    drop_na( # To be able to use these variables inside the coming mutate function
-      exercise_duration, exercise_frequency_per_week, age, death_all_cause,
-      sex, participation_date
-    ) |> 
     mutate(
       minutes_duration_each_exercise_bout = case_when(
-        exercise_duration == "Mindre enn 15 minutter" ~ 7.5, #?
+        exercise_duration == "Mindre enn 15 minutter" ~ 7.5,
         exercise_duration == "15-29 minutter" ~ 22.5,
         exercise_duration == "30 minutter - 1 time" ~ 45,
-        exercise_duration == "Mer enn 1 time" ~ 75
+        exercise_duration == "Mer enn 1 time" ~ 75,
+        TRUE ~ 0
       ),
       frequency_per_week = case_when(
         exercise_frequency_per_week == "En gang i uka" ~ 1,
-        exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5, #?
-        exercise_frequency_per_week == "Omtrent hver dag" ~ 5 #?
+        exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5,
+        exercise_frequency_per_week == "Omtrent hver dag" ~ 5,
+        TRUE ~ 0
       ),
       pa_hrs_per_week = (minutes_duration_each_exercise_bout * frequency_per_week) / 60,
       follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
-      death_all_cause = as.numeric(death_all_cause),
-      packs_of_smoke_per_year = ifelse(is.na(packs_of_smoke_per_year), 0, packs_of_smoke_per_year)
-    )
+      death_all_cause = as.numeric(death_all_cause)
+    ) |> 
+  
+  drop_na(pa_hrs_per_week, age, death_all_cause, participation_date) 
   
 }
 
@@ -160,37 +161,33 @@ process_hunt_4_no_change <- function(dataframe) {
       exercise_frequency_per_week = exe_f_nt4blq1,
       death_all_cause = death_all,
       participation_date = part_dat_nt4blq1,
-      bp_diastolic = bp_dias_mn23_nt4blm,
       bp_systolic = bp_syst_mn23_nt4blm,
       bmi = bmi_nt4blm,
-      packs_of_smoke_per_year = smo_pack_yrs_x_nt4blq1,
-      alcohol_usage = alc_tot_unit_w_nt4blq1,
-      heart_infarction = car_inf_ev_nt4blq1
+      alcohol_usage = alc_tot_unit_w_nt4blq1
     ) |>
     
     # Mutate HUNT 4 variables
     
-    drop_na( # To be able to use these variables inside the coming mutate function
-      exercise_duration, exercise_frequency_per_week, age, death_all_cause,
-      sex, participation_date
-    ) |>
     mutate(
       minutes_duration_each_exercise_bout = case_when(
         exercise_duration == "Mindre enn 15 minutter" ~ 7.5,
         exercise_duration == "15-29 minutter" ~ 22.5,
         exercise_duration == "30-60 minutter" ~ 45,
-        exercise_duration == "Mer enn 60 minutter" ~ 75
+        exercise_duration == "Mer enn 60 minutter" ~ 75,
+        TRUE ~ 0
       ),
       frequency_per_week = case_when(
         exercise_frequency_per_week == "En gang i uka" ~ 1,
         exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5,
-        exercise_frequency_per_week == "Omtrent hver dag" ~ 5
+        exercise_frequency_per_week == "Omtrent hver dag" ~ 5,
+        TRUE ~ 0
       ),
       pa_hrs_per_week = (minutes_duration_each_exercise_bout * frequency_per_week) / 60,
       follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
-      death_all_cause = as.numeric(death_all_cause),
-      packs_of_smoke_per_year = ifelse(is.na(packs_of_smoke_per_year), 0, packs_of_smoke_per_year)
-    )
+      death_all_cause = as.numeric(death_all_cause)
+    ) |> 
+    
+    drop_na(pa_hrs_per_week, age, death_all_cause, participation_date)
   
 }
 
@@ -514,5 +511,3 @@ calculate_person_years_follow_up_strat <- function(dataframes, covariates, class
     }
   }
 }
-
-

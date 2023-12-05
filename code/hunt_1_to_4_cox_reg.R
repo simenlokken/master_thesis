@@ -7,10 +7,6 @@ library(survival)
 
 # DATA PROCESSING FOR HUNT 1, 2, 3 AND 4
 
-# This data is filtered so that all participants have data on PA, death, BP, BMI, smoking, heart infarction and alcohol usage for three
-# HUNT surveys. Note that heart infarction history is only filtered out in HUNT 4 because if you have reported in earlier, you will also
-# report it in HUNT 4.
-
 hunt_1_2_3_4_cleaned_change_in_pa <- full_cleaned_data |> 
   select(contains(match = c("nt1", "nt2", "nt3", "nt4")), age, sex, death_all, end_date_death) |>
   
