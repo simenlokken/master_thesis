@@ -4,78 +4,75 @@ library(tidyverse)
 
 # Source HUNT data
 
-source("Thesis Code/pre_analysis_data_preparation.R")
+source("code/functions.R")
 
-# HUNT 1, no change
+# Number of daily smokers, all surveys
 
-full_cleaned_data |> 
-  select(sex, bp_syst2_nt1blm, bp_dias2_nt1blm, bmi_nt1blm, birth_year, smo_pack_yrs_x_nt1blq2,
-         age) |>
-  drop_na() |> 
-  summarize(
-    mean_age = mean(age),
-    sd_age = sd(birth_year),
-    mean_bmi = mean(bmi_nt1blm),
-    sd_bmi = sd(bmi_nt1blm),
-    mean_bp_sys = mean(bp_syst2_nt1blm),
-    sd_bp_sys = sd(bp_syst2_nt1blm),
-    mean_bp_dia = mean(bp_dias2_nt1blm),
-    sd_bp_dia = sd(bp_dias2_nt1blm),
-    mean_smo = mean(smo_pack_yrs_x_nt1blq2),
-    sd_smo = sd(smo_pack_yrs_x_nt1blq2),
-  )
+count_daily_smokers <- function(dataframe) {
+  dataframe |> 
+    group_by(socioeconomic_class) |> 
+    drop_na(socioeconomic_class) |> 
+    filter(smo_status == "Daglig røyker") |> 
+    count(smo_status)
+}
 
-# HUNT 2, no change
+# Re-use this list for coming functions
 
-full_cleaned_data |> 
-  select(sex, bp_syst_mn23_nt2blm, bp_dias_mn23_nt2blm, bmi_nt2blm, age, smo_pack_yrs_x_nt2blq1) |>
-  drop_na() |> 
-  summarize(
-    mean_age = mean(age),
-    sd_age = sd(age),
-    mean_bmi = mean(bmi_nt2blm),
-    sd_bmi = sd(bmi_nt2blm),
-    mean_bp_sys = mean(bp_syst_mn23_nt2blm),
-    sd_bp_sys = sd(bp_syst_mn23_nt2blm),
-    mean_bp_dia = mean(bp_dias_mn23_nt2blm),
-    sd_bp_dia = sd(bp_dias_mn23_nt2blm),
-    mean_smo = mean(smo_pack_yrs_x_nt2blq1),
-    sd_smo = sd(smo_pack_yrs_x_nt2blq1)
-  )
+hunt_data_socio_strat <- list(
+  hunt_1_cleaned_data_socio_strat,
+  hunt_2_cleaned_data_socio_strat,
+  hunt_3_cleaned_data_socio_strat,
+  hunt_4_cleaned_data_socio_strat
+)
 
+map_df(hunt_data, count_daily_smokers)
 
-# HUNT 3, no change
+# Number of people w/ BMI > 30, all surveys
 
-full_cleaned_data |> 
-  select(sex, bp_syst_mn23_nt3blm, bp_dias_mn23_nt3blm, bmi_nt3blm, age, smo_pack_yrs_x_nt3blq1) |>
-  drop_na() |> 
-  summarize(
-    mean_age = mean(age),
-    sd_age = sd(age),
-    mean_bmi = mean(bmi_nt3blm),
-    sd_bmi = sd(bmi_nt3blm),
-    mean_bp_sys = mean(bp_syst_mn23_nt3blm),
-    sd_bp_sys = sd(bp_syst_mn23_nt3blm),
-    mean_bp_dia = mean(bp_dias_mn23_nt3blm),
-    sd_bp_dia = sd(bp_dias_mn23_nt3blm),
-    mean_smo = mean(smo_pack_yrs_x_nt3blq1),
-    sd_smo = sd(smo_pack_yrs_x_nt3blq1)
-  )
+count_bmi_above_30 <- function(dataframe) {
+  dataframe |> 
+    group_by(socioeconomic_class) |> 
+    drop_na(socioeconomic_class) |> 
+    filter(bmi >= 30) |> 
+    count()
+}
 
-# HUNT 4, no change
+map_df(hunt_data_socio_strat, count_bmi_above_30)
 
-full_cleaned_data |> 
-  select(sex, bp_syst_mn23_nt4blm, bp_dias_mn23_nt4blm, bmi_nt4blm, age, smo_pack_yrs_x_nt4blq1) |>
-  drop_na() |> 
-  summarize(
-    mean_age = mean(age),
-    sd_age = sd(age),
-    mean_bmi = mean(bmi_nt4blm),
-    sd_bmi = sd(bmi_nt4blm),
-    mean_bp_sys = mean(bp_syst_mn23_nt4blm),
-    sd_bp_sys = sd(bp_syst_mn23_nt4blm),
-    mean_bp_dia = mean(bp_dias_mn23_nt4blm),
-    sd_bp_dia = sd(bp_dias_mn23_nt4blm),
-    mean_smo = mean(smo_pack_yrs_x_nt4blq1),
-    sd_smo = sd(smo_pack_yrs_x_nt4blq1)
-  )
+# Number of low socioeconomic class
+
+count_high_occu_pa <- function(dataframe) {
+  dataframe |> 
+    drop_na() |> 
+    group_by(occupational_pa) |> 
+    count()
+}
+
+hunt_data_occu_pa <- list(
+  hunt_1_cleaned_data_occu_strat,
+  hunt_2_cleaned_data_occu_strat,
+  hunt_3_cleaned_data_occu_strat,
+  hunt_4_cleaned_data_occu_strat
+)
+
+map_df(hunt_data_occu_pa, count_high_occu_pa)
+
+# HUNT 1-4 summary stats
+
+calc_sum_stat <- function(dataframe) {
+  dataframe |> 
+    group_by(socioeconomic_class) |> 
+    drop_na(socioeconomic_class, age, bp_systolic, pa_hrs_per_week, bmi) |> 
+    summarise(
+      mean_age = mean(age),
+      sd_age = sd(age),
+      mean_sbp = round(mean(bp_systolic), 1),
+      sd_sbp = round(sd(bp_systolic), 1),
+      mean_ltpa = round(mean(pa_hrs_per_week), 1),
+      sd_ltpa = round(sd(pa_hrs_per_week), 1),
+      mean_bmi = round(mean(bmi), 1),
+      sd_bmi = round(sd(bmi), 1)
+    )
+}
+
+map_df(hunt_data_socio_strat, calc_sum_stat)
