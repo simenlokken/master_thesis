@@ -1,0 +1,86 @@
+---
+title: "Data preparation"
+format: html
+editor: visual
+---
+
+## Information 
+
+This script is a general preparation for the data. It retrieves the data and changes some data types. It has to be run before using any of the other scripts.
+
+## Script
+
+### Set environment and load packages
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  echo = TRUE
+)
+```
+
+### Load data
+
+```{r}
+
+full_data <- readr::read_csv("//fil.nice.ntnu.no/nice/p758/Data master/full_data.csv")
+```
+
+### Process data
+
+```{r}
+
+# Un-capitalize and clean names
+
+full_cleaned_data <- full_data |> 
+  janitor::clean_names()
+
+# Remove initial data frame
+
+rm(full_data)
+
+# Change from chr to fct
+
+full_cleaned_data <- full_cleaned_data |>
+  mutate_if(is.character, as.factor)
+
+# Manually change actual chr back to fct again
+
+full_cleaned_data <- full_cleaned_data |> 
+  mutate(
+    birth_date = as.character(birth_date), 
+    end_date_death = as.character(end_date_death),
+    end_date_icd8910 = as.character(end_date_icd8910),
+    end_date_link = as.character(end_date_link),
+    w22_0389_lopenr_person = as.character(w22_0389_lopenr_person),
+    death_all = as.factor(death_all),
+    death_all_icd = as.factor(death_all_icd),
+    death_cvd = as.factor(death_cvd),
+    death_ihd = as.factor(death_ihd),
+    death_stroke = as.factor(death_stroke),
+    death_ihd = as.factor(death_ihd)
+    )
+
+# Create date objects
+
+full_cleaned_data <- full_cleaned_data |> 
+  mutate(
+    part_dat_nt1blq1 = dmy(part_dat_nt1blq1),
+    part_dat_nt2blq1 = dmy(part_dat_nt2blq1),
+    part_dat_nt3blq1 = dmy(part_dat_nt3blq1),
+    part_dat_nt4blq1 = dmy(part_dat_nt4blq1),
+    end_date_death = dmy(end_date_death),
+    end_date_link = dmy(end_date_link),
+    end_date_icd8910 = dmy(end_date_icd8910),
+    eof_date_death = dmy(eof_date_death)
+  )
+
+# Compute participant age
+
+full_cleaned_data <- full_cleaned_data |> 
+  mutate(
+    age = year(end_date_death) - birth_year
+    )
+```
