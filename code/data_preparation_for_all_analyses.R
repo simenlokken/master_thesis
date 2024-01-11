@@ -55,3 +55,7 @@ full_cleaned_data <- full_cleaned_data |>
 
 full_cleaned_data <- full_cleaned_data |> 
   mutate(age = year(end_date_death) - birth_year)
+
+# Remove full data
+
+rm(full_data)

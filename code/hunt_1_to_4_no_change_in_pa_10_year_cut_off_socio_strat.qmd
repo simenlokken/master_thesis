@@ -5,6 +5,10 @@ format: html
 editor: visual
 ---
 
+## Information
+
+This script contains the analyses for all four HUNT surveys without considering change in LTPA stratified by socioeconomic class while having a cut-off on follow-up time in 10 years or less. Through the analyses I have used own functions which is necessary for computing, see functions.qmd.
+
 ## Set environment and load packages
 
 ```{r setup, include=FALSE}
