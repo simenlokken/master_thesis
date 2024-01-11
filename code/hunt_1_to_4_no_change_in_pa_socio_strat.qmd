@@ -1,0 +1,386 @@
+---
+title: "HUNT 1-4: No change in PA"
+subtitle: "Stratified by socioeconomic class"
+format: html
+editor: visual
+---
+
+## Set environment and load packages
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  echo = TRUE
+)
+```
+
+```{r}
+
+# Packages
+
+library(tidyverse)
+library(survival)
+library(purrr)
+
+# Functions, see functions.R
+
+source("functions.R")
+```
+
+## HUNT 1 - Survival Analysis
+
+#### Process data
+
+```{r}
+
+hunt_1_cleaned_data_socio_strat <- hunt_1_cleaned_data |> 
+  rename(
+    education_level = educ_nt1blq2
+    ) |> 
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+    education_level %in% c(
+      "7-årig folkeskole eller kortere",
+      "9-årig grunnskole", 
+      "Real- eller middelskole, grunnskolen 10.år",
+      "Framhalds- eller fortsettelsesskole"
+      ) ~ "low",
+    education_level %in% c(
+      "Ett- eller toårig videregående skole",
+      "Artium, økonomisk gymnas eller almenfaglig retning i vgs."
+      ) ~ "medium",
+    education_level %in% c(
+      "Høyskole eller universitet, 4 år eller mer", 
+      "Høyskole eller universitet, mindre enn 4 år"
+      )~ "high")
+    )
+  )
+```
+
+#### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_1_cox_reg_crude_socio_strat <- run_cox_reg_crude(
+  hunt_1_cleaned_data_socio_strat, 
+  socioeconomic_class
+  )
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_1_cox_reg_multi_socio_strat <- run_cox_reg_multi(
+  hunt_1_cleaned_data_socio_strat, 
+  socioeconomic_class
+  )
+```
+
+## HUNT 2 - Survival Analysis
+
+#### Process data
+
+```{r}
+
+hunt_2_cleaned_data_socio_strat <- hunt_2_cleaned_data |> 
+  rename(
+    education_level = educ_nt2blq1
+    ) |> 
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+    education_level %in% c(
+      "Grunnskole 7-10 år, framhaldsskole, folkehøgskole"
+      ) ~ "low",
+    education_level %in% c(
+      "Artium, øk.gymnas, allmennfaglig retning i videregående skole", 
+      "Realskole, middelskole, yrkesskole 1-2 årig videregående skole"
+      ) ~ "medium",
+    education_level %in% c(
+      "Høgskole/universitet, 4 år eller mer", 
+      "Høgskole/universitet, mindre enn 4 år"
+      ) ~ "high")
+    )
+  )
+```
+
+#### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_2_cox_reg_crude_socio_strat <- run_cox_reg_crude(
+  hunt_1_cleaned_data_socio_strat, 
+  socioeconomic_class
+  )
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_2_cox_reg_multi_socio_strat <- run_cox_reg_multi(
+  hunt_1_cleaned_data_socio_strat, 
+  socioeconomic_class
+  )
+```
+
+## HUNT 3 - Survival Analysis
+
+#### Process data
+
+```{r}
+
+hunt_3_cleaned_data_socio_strat <- hunt_3_cleaned_data |> 
+  rename(
+    occupational_type = wor_tit_isco1_nt3bli
+    ) |> 
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+    occupational_type %in% c(
+      "Yrker uten krav til utdanning", 
+      "Yrker innen jordbruk, skogbruk og fiske",
+      "Prosess- og maskinoperatører, transportarbeidere mv."
+      ) ~ "low",
+    occupational_type %in% c(
+      "Kontor- og kundeserviceyrker", 
+      "Salgs-, service- og omsorgsyrker", 
+      "Håndverkere o.l.", 
+      "Militære yrker og uoppgitt"
+      ) ~ "medium",
+    occupational_type %in% c(
+      "Administrative ledere og politikere", 
+      "Akademiske yrker", 
+      "Yrker med kortere høyskole- og universitetsutdanning og teknikere"
+      ) ~ "high")
+    )
+  )
+```
+
+#### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_3_cox_reg_crude_socio_strat <- run_cox_reg_crude(
+  hunt_1_cleaned_data_socio_strat, 
+  socioeconomic_class
+  )
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_3_cox_reg_multi_socio_strat <- run_cox_reg_multi(
+  hunt_1_cleaned_data_socio_strat, 
+  socioeconomic_class
+  )
+```
+
+## HUNT 4 - Survival Analysis
+
+#### Process data
+
+```{r}
+
+hunt_4_cleaned_data_socio_strat <- hunt_4_cleaned_data |> 
+  rename(
+    education_level = educ_nt4blq1
+    ) |> 
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+      education_level %in% c(
+        "Grunnskole", 
+        "Fagbrev eller svennebrev"
+        ) ~ "low",
+      education_level %in% c(
+        "3 år i videregående skole", 
+        "1-2årig videregående skole"
+        ) ~ "medium",
+      education_level %in% c(
+        "Høyskole/universitet, 4 år eller mer", 
+        "Høyskole/universitet, mindre enn 4 år"
+        ) ~ "high")
+    )
+  )
+```
+
+#### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_4_cox_reg_crude_socio_strat <- run_cox_reg_crude(
+  hunt_1_cleaned_data_socio_strat, 
+  socioeconomic_class
+  )
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_4_cox_reg_multi_socio_strat <- run_cox_reg_multi(
+  hunt_1_cleaned_data_socio_strat, 
+  socioeconomic_class
+  )
+```
+
+## Summary statistics from the models
+
+### Crude model
+
+#### Create vectors with data frames, socioeconomic classes and covariates
+
+```{r}
+
+# Create a vector of the dataframes 
+
+dataframes_socio_strat <- c(
+  "hunt_1_cleaned_data_socio_strat", 
+  "hunt_2_cleaned_data_socio_strat", 
+  "hunt_3_cleaned_data_socio_strat", 
+  "hunt_4_cleaned_data_socio_strat"
+  )
+
+# Create a vector of socioeconomic classes
+
+socioeconomic_classes <- c(
+  "low", 
+  "medium", 
+  "high"
+  )
+
+# Create vector of the covariates for the multi-adjusted model
+
+crude_covariates_socio_strat <- c(
+  "pa_hrs_per_week", 
+  "age", 
+  "follow_up_time_in_years", 
+  "death_all_cause", 
+  "socioeconomic_class"
+  )
+```
+
+#### Compute summary statistics
+
+```{r}
+
+# Calculate number of participants
+
+calculate_num_of_participants_strat(
+  dataframes = dataframes_socio_strat,
+  covariates = crude_covariates_socio_strat,
+  classes = socioeconomic_classes,
+  stratifier = socioeconomic_class
+)
+```
+
+```{r}
+
+# Calculate person-years follow-up
+
+calculate_person_years_follow_up_strat(
+  dataframes = dataframes_socio_strat,
+  covariates = crude_covariates_socio_strat,
+  classes = socioeconomic_classes,
+  stratifier = socioeconomic_class
+)
+```
+
+### Multi-adjusted model
+
+#### Create vectors with data frames and covariates
+
+```{r}
+
+# Create vector of the covariates for the multi-adjusted model
+
+multi_adjusted_covariates_socio_strat <- c(
+  "age", 
+  "pa_hrs_per_week", 
+  "follow_up_time_in_years", 
+  "death_all_cause", 
+  "bp_systolic",
+  "bmi", 
+  "smo_status", 
+  "sex", 
+  "alcohol_usage", 
+  "socioeconomic_class"
+  )
+
+# We're re-using the dataframes vector and the socioeconomic class vector
+# created for the crude model
+```
+
+#### Compute summary statistics
+
+```{r}
+
+# Number of participants
+
+calculate_num_of_participants(
+  dataframes = dataframes,
+  covariates = crude_covariates
+)
+```
+
+```{r}
+
+# Person-years follow-up
+
+calculate_person_years_follow_up(
+  dataframes = dataframes, 
+  covariates = crude_covariates
+)
+```
+
+```{r}
+
+# Number of deaths
+
+calculate_num_of_deaths(
+  dataframes = dataframes,
+  covariates = crude_covariates
+)
+```
+
+### Combine all data from the models in a tibble
+
+This is done for readability.
+
+```{r}
+
+
+tibble(
+  survey = c("HUNT 1", "HUNT 2", "HUNT 3", "HUNT 4"),
+  number_of_participants = c(33926,50931, 36118, 38430),
+  num_of_deaths = c(17011, 13992, 4024, 405),
+  person_years_follow_up = c(931806, 1093581, 458556, 102768),
+  incidence_rate = (num_of_deaths) / (person_years_follow_up) * 1000,
+  multi_hr = c(1.040, 0.946, 0.948, 0.881),
+  ci_low = c(1.030, 0.933, 0.928, 0.822),
+  ci_high = c(1.050, 0.958, 0.968, 0.945)
+)
+
+# Crude model
+
+tibble(
+  survey = c("HUNT 1", "HUNT 2", "HUNT 3", "HUNT 4"),
+  number_of_participants = c(35080, 54397, 38456, 44627),
+  num_of_deaths = c(17984, 15362, 4705, 604),
+  person_years_follow_up = c(953010, 1160780, 485785, 119545),
+  incidence_rate = (num_of_deaths) / (person_years_follow_up) * 1000,
+  crude_hr = c(1.070, 0.920, 0.951, 0.846),
+  ci_low = c(1.060, 0.909, 0.932, 0.797),
+  ci_high = c(1.080, 0.932, 0.970, 0.898)
+)
+```
