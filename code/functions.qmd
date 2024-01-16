@@ -22,7 +22,7 @@ process_hunt_1_no_change <- function(dataframe) {
     
     # Select all variables of interest, also those for creating socioeconomic and occupational PA classes
     
-    select(contains(match = "nt1"), age, sex, death_all, end_date_death)
+    select(contains(match = "nt1"), age, sex, death_all, end_date_death) |> 
     
     # Rename HUNT 1 variables
     
@@ -58,7 +58,7 @@ process_hunt_1_no_change <- function(dataframe) {
       pa_hrs_per_week = (minutes_duration_each_exercise_bout * exercise_frequency_per_week) / 60,
       follow_up_time_in_years = round(as.numeric(interval(participation_date, end_date_death) / dyears(1)), 1),
       death_all_cause = as.numeric(death_all_cause) # Surv() input needs to be numeric
-    ) |> 
+    ) |>
     
     # Get columns in a logical order for readability
     
@@ -93,7 +93,7 @@ process_hunt_2_no_change <- function(dataframe) {
     
     # Select relevant variables
     
-    select(contains(match = "nt2"), age, sex, death_all, end_date_death) 
+    select(contains(match = "nt2"), age, sex, death_all, end_date_death) |>
     
     # HUNT 2 renaming of variables
     
@@ -234,7 +234,7 @@ process_hunt_4_no_change <- function(dataframe) {
     
     # Select relevant variables
     
-    select(contains(match = "nt4"), age, sex, death_all, end_date_death)
+    select(contains(match = "nt4"), age, sex, death_all, end_date_death) |> 
     
     # Rename HUNT 4 variables
     
@@ -508,6 +508,32 @@ process_hunt_4_change <- function(dataframe) {
 
 ## Regression modelling functions
 
+### Cox regression
+
+```{r}
+
+run_cox_reg <- function(data, strata = NULL, time, status, covariates) {
+  
+  f <- paste0('Surv(', deparse(substitute(time)), ',',
+                     deparse(substitute(status)), ') ~ ', 
+                     paste(covariates, collapse = ' + '))
+ 
+  data |> 
+    group_by({{ strata }}) |> 
+    drop_na({{ strata }}) |> 
+    nest() |> 
+    mutate(test_results = map(
+      .x = data, 
+      .f = ~ coxph(as.formula(f), data =.x) |> 
+      broom::tidy(conf.int = TRUE, exponentiate = TRUE))
+    ) |>  
+    unnest(test_results) |> 
+    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
+    ungroup()
+}
+```
+
+
 ### Crude Cox regression
 
 ```{r}
@@ -518,18 +544,16 @@ run_cox_reg_crude <- function(dataframe, strata) {
     group_by({{ strata }}) |> 
     drop_na({{ strata }} ) |> 
     nest() |> 
-    mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week + 
-                                             age, data =.x) |> 
-                                broom::tidy(conf.int = TRUE, exponentiate = TRUE))
-           
+    mutate(test_results = map(
+      .x = data, 
+      .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ pa_hrs_per_week + age, data =.x) |> 
+        broom::tidy(conf.int = TRUE, exponentiate = TRUE))
     ) |> 
     unnest(test_results) |>  
     select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
     ungroup()
   
   return(result)
-  
 }
 ```
 
@@ -556,7 +580,6 @@ run_cox_reg_multi <- function(dataframe, strata) {
     ungroup()
   
   return(result)
-  
 }
 ```
 

@@ -27,10 +27,6 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(survival)
 library(purrr)
-
-# Functions, see functions.R
-
-source("functions.R")
 ```
 
 ## HUNT 1 - Survival Analysis
@@ -40,9 +36,6 @@ source("functions.R")
 ```{r}
 
 hunt_1_cleaned_data_socio_strat <- hunt_1_cleaned_data |> 
-  rename(
-    education_level = educ_nt1blq2
-    ) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     education_level %in% c(
@@ -92,9 +85,6 @@ hunt_1_cox_reg_multi_socio_strat <- run_cox_reg_multi(
 ```{r}
 
 hunt_2_cleaned_data_socio_strat <- hunt_2_cleaned_data |> 
-  rename(
-    education_level = educ_nt2blq1
-    ) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     education_level %in% c(
@@ -141,9 +131,6 @@ hunt_2_cox_reg_multi_socio_strat <- run_cox_reg_multi(
 ```{r}
 
 hunt_3_cleaned_data_socio_strat <- hunt_3_cleaned_data |> 
-  rename(
-    occupational_type = wor_tit_isco1_nt3bli
-    ) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     occupational_type %in% c(
@@ -195,20 +182,17 @@ hunt_3_cox_reg_multi_socio_strat <- run_cox_reg_multi(
 ```{r}
 
 hunt_4_cleaned_data_socio_strat <- hunt_4_cleaned_data |> 
-  rename(
-    education_level = educ_nt4blq1
-    ) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
-      education_level %in% c(
+      educational_level %in% c(
         "Grunnskole", 
         "Fagbrev eller svennebrev"
         ) ~ "low",
-      education_level %in% c(
+      educational_level %in% c(
         "3 år i videregående skole", 
         "1-2årig videregående skole"
         ) ~ "medium",
-      education_level %in% c(
+      educational_level %in% c(
         "Høyskole/universitet, 4 år eller mer", 
         "Høyskole/universitet, mindre enn 4 år"
         ) ~ "high")

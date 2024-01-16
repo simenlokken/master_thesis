@@ -27,10 +27,6 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(survival)
 library(purrr)
-
-# Functions, see functions.R
-
-source("functions.R")
 ```
 
 ## HUNT 1 - Survival Analysis
@@ -40,9 +36,6 @@ source("functions.R")
 ```{r}
 
 hunt_1_cleaned_data_occu_strat <- hunt_1_cleaned_data |>
-  rename(
-    heavy_physical_work = wor_heav_nt1blq2
-    ) |> 
   mutate(
     occupational_pa = as.factor(case_when(
       heavy_physical_work %in% c(
@@ -80,9 +73,6 @@ hunt_1_cox_reg_multi <- run_cox_reg_multi(hunt_1_cleaned_data, strata = NULL)
 ```{r}
 
 hunt_2_cleaned_data_occu_strat <- hunt_2_cleaned_data |>
-  rename(
-    heavy_physical_work = wor_heav_nt2blq2
-    ) |> 
   mutate(
     occupational_pa = as.factor(case_when(
       heavy_physical_work %in% c(
@@ -116,9 +106,6 @@ hunt_2_cox_reg_multi <- run_cox_reg_multi(hunt_2_cleaned_data, strata = NULL)
 ```{r}
 
 hunt_3_cleaned_data_occu_strat <- hunt_3_cleaned_data |>
-  rename(
-    heavy_physical_work = wor_heav_nt3blq2
-    ) |> 
   mutate(
     occupational_pa = as.factor(case_when(
       heavy_physical_work %in% c(
@@ -156,9 +143,6 @@ hunt_3_cox_reg_multi <- run_cox_reg_multi(hunt_3_cleaned_data, strata = NULL)
 ```{r}
 
 hunt_4_cleaned_data_occu_strat <- hunt_4_cleaned_data |>
-  rename(
-    heavy_physical_work = wor_heav_nt4blq2
-    ) |> 
   mutate(
     occupational_pa = as.factor(case_when(
       heavy_physical_work %in% c(

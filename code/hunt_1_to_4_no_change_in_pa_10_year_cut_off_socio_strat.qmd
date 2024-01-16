@@ -23,10 +23,6 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(survival)
 library(purrr)
-
-# Functions, see functions.R
-
-source("functions.R")
 ```
 
 ## HUNT 1 - Survival Analysis
@@ -36,25 +32,11 @@ source("functions.R")
 ```{r}
 
 hunt_1_cleaned_data_10_yrs <- full_cleaned_data |> 
-  process_hunt_1_no_change() |> 
+  process_hunt_1_no_change() |>
   select(
-    age,
-    sex,
-    pa_hrs_per_week, 
-    alcohol_usage, 
-    smo_status, 
-    participation_date, 
-    bmi, 
-    follow_up_time_in_years, 
-    end_date_death,
-    educ_nt1blq2,
-    death_all_cause,
-    bp_systolic
+    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
   ) |> 
   drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
-  rename(
-    education_level = educ_nt1blq2
-    ) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     education_level %in% c(
@@ -103,23 +85,9 @@ hunt_1_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_1_cleaned_data_10_yrs, str
 hunt_2_cleaned_data_10_yrs <- full_cleaned_data |> 
   process_hunt_2_no_change() |> 
   select(
-    age,
-    sex,
-    pa_hrs_per_week, 
-    alcohol_usage, 
-    smo_status, 
-    participation_date, 
-    bmi, 
-    follow_up_time_in_years, 
-    end_date_death,
-    educ_nt2blq1,
-    death_all_cause,
-    bp_systolic
-  ) |> 
+    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
+  ) |>
   drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
-  rename(
-    education_level = educ_nt2blq1
-    ) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     education_level %in% c(
@@ -165,23 +133,9 @@ hunt_2_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_2_cleaned_data_10_yrs, str
 hunt_3_cleaned_data_10_yrs <- full_cleaned_data |> 
   process_hunt_3_no_change() |> 
   select(
-    age,
-    sex,
-    pa_hrs_per_week, 
-    alcohol_usage, 
-    smo_status, 
-    participation_date, 
-    bmi, 
-    follow_up_time_in_years, 
-    end_date_death,
-    wor_tit_isco1_nt3bli,
-    death_all_cause,
-    bp_systolic
-  ) |> 
+    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
+  ) |>
   drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
-  rename(
-    occupational_type = wor_tit_isco1_nt3bli
-    ) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     occupational_type %in% c(
@@ -232,34 +186,20 @@ hunt_3_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_3_cleaned_data_10_yrs, str
 hunt_4_cleaned_data_10_yrs <- full_cleaned_data |> 
   process_hunt_4_no_change() |> 
   select(
-    age,
-    sex,
-    pa_hrs_per_week, 
-    alcohol_usage, 
-    smo_status, 
-    participation_date, 
-    bmi, 
-    follow_up_time_in_years, 
-    end_date_death,
-    educ_nt4blq1,
-    death_all_cause,
-    bp_systolic
-  ) |> 
+    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
+  ) |>
   drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
-  rename(
-    education_level = educ_nt4blq1
-    ) |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
-      education_level %in% c(
+      educational_level %in% c(
         "Grunnskole", 
         "Fagbrev eller svennebrev"
         ) ~ "low",
-      education_level %in% c(
+      educational_level %in% c(
         "3 år i videregående skole", 
         "1-2årig videregående skole"
         ) ~ "medium",
-      education_level %in% c(
+      educational_level %in% c(
         "Høyskole/universitet, 4 år eller mer", 
         "Høyskole/universitet, mindre enn 4 år"
         ) ~ "high")
