@@ -2,6 +2,8 @@
 title: "HUNT 1-4: No change in PA"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Information
@@ -21,21 +23,44 @@ knitr::opts_chunk$set(
 
 ```{r}
 
-# Packages
-
 library(tidyverse)
 library(survival)
 library(purrr)
+library(patchwork)
+
+theme_set(theme_minimal())
 ```
 
 ## HUNT 1 - Survival Analysis
+
+### LTPA index variable
 
 #### Process data
 
 ```{r}
 
-hunt_1_cleaned_data <- full_cleaned_data |> 
-  process_hunt_1_no_change()
+hunt_1_cleaned_data_ltpa_index <- hunt_1_cleaned_full_data |> 
+  process_hunt_1_no_change_index()
+```
+
+
+#### Visualizing LTPA index distribution
+
+```{r}
+
+h1 <- hunt_1_cleaned_data |> 
+  ggplot(aes(x = ltpa_index)) +
+  geom_histogram()
+
+h2 <- hunt_1_cleaned_data |>
+  filter(ltpa_index > 0) |> 
+  ggplot(aes(x = ltpa_index)) +
+  geom_histogram()
+
+patchwork::wrap_plots(h1, h2)
+
+hunt_1_cleaned_data |> 
+  count(ltpa_index)
 ```
 
 #### Run Cox models
@@ -44,80 +69,325 @@ Crude:
 
 ```{r}
 
-hunt_1_cox_reg_crude <- run_cox_reg_crude(hunt_1_cleaned_data, strata = NULL)
+hunt_1_cox_reg_crude_ltpa_index <- run_cox_reg_crude(hunt_1_cleaned_data_ltpa_index, strata = NULL)
 ```
 
 Multi-adjusted:
 
 ```{r}
 
-hunt_1_cox_reg_multi <- run_cox_reg_multi(hunt_1_cleaned_data, strata = NULL)
+hunt_1_cox_reg_multi_ltpa_index <- run_cox_reg_multi(hunt_1_cleaned_data_ltpa_index, strata = NULL)
+```
+
+### Quasi-continuous variable (min/week)
+
+#### Process data
+
+```{r}
+
+hunt_1_cleaned_data_cont_var <- hunt_1_cleaned_full_data |> 
+  process_hunt_1_no_change_cont_var()
+```
+
+#### Visualizing distribution
+
+```{r}
+
+h1 <- hunt_1_cleaned_data_cont_var |> 
+  ggplot(aes(x = pa_min_per_week)) +
+  geom_histogram()
+
+h2 <- hunt_1_cleaned_data_cont_var |>
+  filter(pa_min_per_week > 0) |> 
+  ggplot(aes(x = pa_min_per_week)) +
+  geom_histogram()
+
+patchwork::wrap_plots(h1, h2)
+
+hunt_1_cleaned_data_cont_var |> 
+  count(pa_min_per_week)
+
+```
+
+#### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_1_cox_reg_crude_cont_var <- run_cox_reg_crude(hunt_1_cleaned_data_cont_var, strata = NULL, pa_var = "pa_min_per_week")
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_1_cox_reg_multi_cont_var <- run_cox_reg_multi(hunt_1_cleaned_data_cont_var, strata = NULL, "pa_min_per_week")
 ```
 
 ## HUNT 2 - Survival Analysis
 
+Due to the difference in how the LTPA questions are asked in HUNT 2, there are only model and that used a quasi-continuous variable (min/week).
+
+### Quasi-continuous variable (min/week)
+
 #### Process data
+
+There are approx. 16 000 participants who lack a participation date and therefore follow-up time in HUNT 2. We compute a participation date for these individuals manually, see functions.qmd for more details. 
 
 ```{r}
 
-hunt_2_cleaned_data <- full_cleaned_data |> 
-  process_hunt_2_no_change()
+hunt_2_cleaned_data_cont_var <- hunt_2_cleaned_full_data |> 
+  process_hunt_2_no_change_cont_var()
+```
+
+#### Visualizing distribution
+
+```{r}
+
+h1 <- hunt_2_cleaned_data_cont_var |> 
+  ggplot(aes(x = pa_min_per_week)) +
+  geom_histogram()
+
+h2 <- hunt_2_cleaned_data_cont_var |>
+  filter(pa_min_per_week > 0) |> 
+  ggplot(aes(x = pa_min_per_week)) +
+  geom_histogram()
+
+patchwork::wrap_plots(h1, h2)
+
+hunt_2_cleaned_data_cont_var |> 
+  count(pa_min_per_week)
 ```
 
 #### Run Cox models
 
+Crude:
+
 ```{r}
 
-hunt_2_cox_reg_crude <- run_cox_reg_crude(hunt_2_cleaned_data, strata = NULL)
+hunt_2_cox_reg_crude <- run_cox_reg_crude(hunt_2_cleaned_data_cont_var, strata = NULL, pa_var = "pa_min_per_week")
 ```
 
+Multi-adjusted:
+
 ```{r}
 
-hunt_2_cox_reg_multi <- run_cox_reg_multi(hunt_2_cleaned_data, strata = NULL)
+hunt_2_cox_reg_multi <- run_cox_reg_multi(hunt_2_cleaned_data_cont_var, strata = NULL, pa_var = "pa_min_per_week")
 ```
 
 ## HUNT 3 - Survival Analysis
 
+There are approx. 25 000 individuals who lack a participation date, these are computed manually. See "functions.qmd". 
+
+### LTPA index variable
+
 #### Process data
 
 ```{r}
 
-hunt_3_cleaned_data <- full_cleaned_data |>
-  process_hunt_3_no_change()
+hunt_3_cleaned_data_ltpa_index <- hunt_3_cleaned_full_data |> 
+  process_hunt_3_no_change_index()
+```
+
+#### Visualizing distribution
+
+```{r}
+
+h1 <- hunt_3_cleaned_data_ltpa_index |> 
+  ggplot(aes(x = ltpa_index)) +
+  geom_histogram()
+
+h2 <- hunt_3_cleaned_data_ltpa_index |>
+  filter(ltpa_index > 0) |> 
+  ggplot(aes(x = ltpa_index)) +
+  geom_histogram()
+
+patchwork::wrap_plots(h1, h2)
+
+hunt_3_cleaned_data_ltpa_index |> 
+  count(ltpa_index)
 ```
 
 #### Run Cox models
 
+Crude:
+
 ```{r}
 
-hunt_3_cox_reg_crude <- run_cox_reg_crude(hunt_3_cleaned_data, strata = NULL)
+hunt_3_cox_reg_crude_ltpa_index <- run_cox_reg_crude(
+  hunt_3_cleaned_data_ltpa_index, 
+  strata = NULL, 
+  pa_var = "ltpa_index"
+)
 ```
 
+Multi-adjusted:
+
 ```{r}
 
-hunt_3_cox_reg_multi <- run_cox_reg_multi(hunt_3_cleaned_data, strata = NULL)
+hunt_3_cox_reg_multi_ltpa_index <- run_cox_reg_multi(
+  hunt_3_cleaned_data_ltpa_index, 
+  strata = NULL, 
+  pa_var = "ltpa_index"
+)
+```
+
+### Quasi-continuous variable
+
+#### Process data
+
+```{r}
+
+hunt_3_cleaned_data_cont_var <- hunt_3_cleaned_full_data |> 
+  process_hunt_3_no_change_cont_var()
+```
+
+#### Visualizing distribution
+
+```{r}
+
+h1 <- hunt_3_cleaned_data_cont_var |> 
+  ggplot(aes(x = pa_min_per_week)) +
+  geom_histogram()
+
+h2 <- hunt_3_cleaned_data_cont_var |>
+  filter(pa_min_per_week > 0) |> 
+  ggplot(aes(x = pa_min_per_week)) +
+  geom_histogram()
+
+patchwork::wrap_plots(h1, h2)
+
+hunt_3_cleaned_data_cont_var |> 
+  count(pa_min_per_week)
+```
+
+#### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_3_cox_reg_crude_cont_var <- run_cox_reg_crude(
+  hunt_3_cleaned_data_cont_var,
+  strata = NULL,
+  pa_var = "pa_min_per_week"
+)
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_3_cox_reg_multi_cont_var <- run_cox_reg_multi(
+  hunt_3_cleaned_data_cont_var,
+  strata = NULL,
+  pa_var = "pa_min_per_week"
+)
 ```
 
 ## HUNT 4 - Survival Analysis
 
+### LTPA index variable
+
 #### Process data
 
 ```{r}
 
-hunt_4_cleaned_data <- full_cleaned_data |> 
-  process_hunt_4_no_change()
+hunt_4_cleaned_data_ltpa_index <- hunt_4_cleaned_full_data |> 
+  process_hunt_4_no_change_ltpa_index()
+```
+
+#### Visualizing distribution
+
+```{r}
+
+h1 <- hunt_4_cleaned_data_ltpa_index |> 
+  ggplot(aes(x = ltpa_index)) +
+  geom_histogram()
+
+h2 <- hunt_4_cleaned_data_ltpa_index |>
+  filter(ltpa_index > 0) |> 
+  ggplot(aes(x = ltpa_index)) +
+  geom_histogram()
+
+patchwork::wrap_plots(h1, h2)
+
+hunt_4_cleaned_data_ltpa_index |> 
+  count(ltpa_index)
 ```
 
 #### Run Cox models
 
 ```{r}
 
-hunt_4_cox_reg_crude <- run_cox_reg_crude(hunt_4_cleaned_data, strata = NULL)
+hunt_4_cox_reg_crude_ltpa_index <- run_cox_reg_crude(
+  hunt_4_cleaned_data_ltpa_index,
+  strata = NULL,
+  pa_var = "ltpa_index"
+)
 ```
 
 ```{r}
 
-hunt_4_cox_reg_multi <- run_cox_reg_multi(hunt_4_cleaned_data, strata = NULL)
+hunt_4_cox_reg_multi_ltpa_index <- run_cox_reg_multi(
+  hunt_4_cleaned_data_ltpa_index,
+  strata = NULL,
+  pa_var = "ltpa_index"
+)
+```
+
+### Quasi-continuous variable
+
+#### Process data
+
+```{r}
+
+hunt_4_cleaned_data_cont_var <- hunt_4_cleaned_full_data |> 
+  process_hunt_4_no_change_cont_var()
+```
+
+#### Visualizing distribution
+
+```{r}
+
+h1 <- hunt_4_cleaned_data_cont_var |> 
+  ggplot(aes(x = pa_min_per_week)) +
+  geom_histogram()
+
+h2 <- hunt_4_cleaned_data_cont_var |>
+  filter(pa_min_per_week > 0) |> 
+  ggplot(aes(x = pa_min_per_week)) +
+  geom_histogram()
+
+patchwork::wrap_plots(h1, h2)
+
+hunt_4_cleaned_data_cont_var |> 
+  count(pa_min_per_week)
+```
+
+#### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_4_cox_reg_crude_cont_var <- run_cox_reg_crude(
+  hunt_4_cleaned_data_cont_var,
+  strata = NULL,
+  pa_var = "pa_min_per_week"
+)
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_4_cox_reg_multi_cont_var <- run_cox_reg_multi(
+  hunt_4_cleaned_data_cont_var,
+  strata = NULL,
+  pa_var = "pa_min_per_week"
+)
 ```
 
 ## Summary statistics from the models
