@@ -3,11 +3,17 @@ title: "HUNT 1-4: No change in PA"
 author: "10 year cut-off"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Information
 
 This script contains the analyses for all four HUNT surveys without considering change in LTPA stratified by socioeconomic class while having a cut-off on follow-up time in 10 years or less. Through the analyses I have used own functions which is necessary for computing, see functions.qmd.
+
+These analyses are also done with the **quasi-continuous** PA variable.
+
+In all of the data processing for these analyses, drop_na() has been used because it ensures that the same participants are used in both the crude and multi-adjusted model. If not, we wouldn't have analyzed the same participants. 
 
 ## Set environment and load packages
 
@@ -31,12 +37,9 @@ library(purrr)
 
 ```{r}
 
-hunt_1_cleaned_data_10_yrs <- full_cleaned_data |> 
-  process_hunt_1_no_change() |>
-  select(
-    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
-  ) |> 
-  drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
+hunt_1_cleaned_data_10_yrs <- hunt_1_cleaned_full_data |> 
+  process_hunt_1_no_change_cont_var() |>
+  drop_na() |>
   mutate(
     socioeconomic_class = as.factor(case_when(
     education_level %in% c(
@@ -66,14 +69,22 @@ Crude:
 
 ```{r}
 
-hunt_1_cox_reg_crude_10_yrs <- run_cox_reg_crude(hunt_1_cleaned_data_10_yrs, strata = socioeconomic_class)
+hunt_1_cox_reg_crude_10_yrs <- run_cox_reg_crude(
+  hunt_1_cleaned_data_10_yrs, 
+  strata = socioeconomic_class,
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 Multi-adjusted:
 
 ```{r}
 
-hunt_1_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_1_cleaned_data_10_yrs, strata = socioeconomic_class)
+hunt_1_cox_reg_multi_10_yrs <- run_cox_reg_multi(
+  hunt_1_cleaned_data_10_yrs, 
+  strata = socioeconomic_class,
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 ## HUNT 2 - Survival Analysis
@@ -82,12 +93,8 @@ hunt_1_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_1_cleaned_data_10_yrs, str
 
 ```{r}
 
-hunt_2_cleaned_data_10_yrs <- full_cleaned_data |> 
-  process_hunt_2_no_change() |> 
-  select(
-    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
-  ) |>
-  drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
+hunt_2_cleaned_data_10_yrs <- hunt_2_cleaned_full_data |> 
+  process_hunt_2_no_change_cont_var() |>
   mutate(
     socioeconomic_class = as.factor(case_when(
     education_level %in% c(
@@ -114,14 +121,22 @@ Crude:
 
 ```{r}
 
-hunt_2_cox_reg_crude_10_yrs <- run_cox_reg_crude(hunt_2_cleaned_data_10_yrs, strata = socioeconomic_class)
+hunt_2_cox_reg_crude_10_yrs <- run_cox_reg_crude(
+  hunt_2_cleaned_data_10_yrs, 
+  strata = socioeconomic_class,
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 Multi-adjusted:
 
 ```{r}
 
-hunt_2_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_2_cleaned_data_10_yrs, strata = socioeconomic_class)
+hunt_2_cox_reg_multi_10_yrs <- run_cox_reg_multi(
+  hunt_2_cleaned_data_10_yrs, 
+  strata = socioeconomic_class,
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 ## HUNT 3 - Survival Analysis
@@ -130,12 +145,9 @@ hunt_2_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_2_cleaned_data_10_yrs, str
 
 ```{r}
 
-hunt_3_cleaned_data_10_yrs <- full_cleaned_data |> 
-  process_hunt_3_no_change() |> 
-  select(
-    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
-  ) |>
-  drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
+hunt_3_cleaned_data_10_yrs <- hunt_3_cleaned_full_data |> 
+  process_hunt_3_no_change_cont_var() |> 
+  drop_na() |>
   mutate(
     socioeconomic_class = as.factor(case_when(
     occupational_type %in% c(
@@ -167,14 +179,22 @@ Crude:
 
 ```{r}
 
-hunt_3_cox_reg_crude_10_yrs <- run_cox_reg_crude(hunt_3_cleaned_data_10_yrs, strata = socioeconomic_class)
+hunt_3_cox_reg_crude_10_yrs <- run_cox_reg_crude(
+  hunt_3_cleaned_data_10_yrs, 
+  strata = socioeconomic_class,
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 Multi-adjusted:
 
 ```{r}
 
-hunt_3_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_3_cleaned_data_10_yrs, strata = socioeconomic_class)
+hunt_3_cox_reg_multi_10_yrs <- run_cox_reg_multi(
+  hunt_3_cleaned_data_10_yrs, 
+  strata = socioeconomic_class,
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 ## HUNT 4 - Survival Analysis
@@ -183,12 +203,9 @@ hunt_3_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_3_cleaned_data_10_yrs, str
 
 ```{r}
 
-hunt_4_cleaned_data_10_yrs <- full_cleaned_data |> 
-  process_hunt_4_no_change() |> 
-  select(
-    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
-  ) |>
-  drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
+hunt_4_cleaned_data_10_yrs <- hunt_4_cleaned_full_data |> 
+  process_hunt_4_no_change_cont_var() |> 
+  drop_na() |>
   mutate(
     socioeconomic_class = as.factor(case_when(
       educational_level %in% c(
@@ -216,12 +233,22 @@ Crude:
 
 ```{r}
 
-hunt_4_cox_reg_crude_10_yrs <- run_cox_reg_crude(hunt_4_cleaned_data_10_yrs, strata = socioeconomic_class)
+hunt_4_cox_reg_crude_10_yrs <- run_cox_reg_crude(
+  hunt_4_cleaned_data_10_yrs, 
+  strata = socioeconomic_class,
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 Multi-adjusted:
 
+The loglik converges here, coefficient gets infinite.
+
 ```{r}
 
-hunt_4_cox_reg_multi_10_yrs <- run_cox_reg_multi(hunt_4_cleaned_data_10_yrs, strata = socioeconomic_class)
+hunt_4_cox_reg_multi_10_yrs <- run_cox_reg_multi(
+  hunt_4_cleaned_data_10_yrs, 
+  strata = socioeconomic_class,
+  pa_var = "pa_min_per_week"
+  )
 ```

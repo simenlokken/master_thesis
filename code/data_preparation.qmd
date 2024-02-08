@@ -2,15 +2,15 @@
 title: "Data preparation"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
-## Information 
+## Information
 
-This script is a general preparation for the data. It retrieves the data and changes some data types. It has to be run before using any of the other scripts.
+This script is a general preparation for the data. It retrieves the data and does some basic processing. In addition, it distinguished the data from the different surveys and saves them in separate data frames-
 
-## Script
-
-### Set environment and load packages
+## Set environment and load packages
 
 ```{r setup, include=FALSE}
 
@@ -26,14 +26,18 @@ knitr::opts_chunk$set(
 library(tidyverse)
 ```
 
-### Load data
+## Load data
 
 ```{r}
 
-full_data <- readr::read_csv("//fil.nice.ntnu.no/nice/p758/Data master/full_data.csv")
+full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/Data master/full_data.csv")
 ```
 
-### Process data
+## Process data
+
+### Basic processing
+
+Un-capitazing names, change variable types and create date-time objects.
 
 ```{r}
 
@@ -85,7 +89,114 @@ full_cleaned_data <- full_cleaned_data |>
 # Compute participant age
 
 full_cleaned_data <- full_cleaned_data |> 
-  mutate(
-    age = year(end_date_death) - birth_year
+  mutate(age = year(end_date_death) - birth_year)
+```
+
+### Distinguish different HUNT surveys into separate data frames
+
+#### Data frames for no change in LTPA
+
+Since all the data for all four surveys are in one dataset, we have to distinguish them into four separate data sets.
+
+Each survey has two variables called BLM and a variable related to each sub-survey. We use these to distinguish.
+
+#### HUNT 1
+
+Q2 is the relevant Q for H1, it contains data on exercise, work, education, smoking and alcohol
+
+```{r}
+
+hunt_1_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = "nt1"), age, sex, end_date_death, death_all) |> 
+  filter(!is.na(part_nt1blq2) & !is.na(part_nt1blm))
+```
+
+#### HUNT 2
+
+Q1 is the relevant for Q for H2, it contains data on exercise, work, education, smoking and alcohol
+
+```{r}
+
+hunt_2_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = "nt2"), age, sex, end_date_death, death_all) |> 
+  filter(!is.na(part_nt2blq1) & !is.na(part_nt2blm))
+```
+
+#### HUNT 3
+
+Q1 is the relevant for Q for H3, it contains data on exercise, work, education, smoking and alcohol
+
+```{r}
+
+hunt_3_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = "nt3"), age, sex, end_date_death, death_all) |> 
+  filter(!is.na(part_nt3blq1) & !is.na(part_nt3blm))
+```
+
+#### HUNT 4
+
+Have no information on the surveys, so just did a filtering on baseline measurements (i.e, blm variable)
+
+```{r}
+
+hunt_4_cleaned_full_data <- full_cleaned_data |>
+  select(contains(match = "nt4"), age, sex, end_date_death, death_all) |> 
+  filter(!is.na(part_nt4blm))
+```
+
+#### Data frames for change in LTPA
+
+##### HUNT 3-4
+
+```{r}
+
+hunt_3_4 <- full_cleaned_data |> 
+  select(contains(match = c("nt3", "nt4"))) |> 
+  filter(
+    !is.na(part_nt3blq1) & !is.na(part_nt3blm) & !is.na(part_nt4blm)
     )
 ```
+
+##### HUNT 1-3-4
+
+```{r}
+
+hunt_1_3_4 <- full_cleaned_data |> 
+  select(contains(match = c("nt1", "nt3", "nt4"))) |> 
+  filter(
+    !is.na(part_nt1blq2) & !is.na(part_nt1blm) & !is.na(part_nt3blq1) & !is.na(part_nt3blq1) & !is.na(part_nt4blm)
+  )
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -3,11 +3,15 @@ title: "HUNT 1-4: No change in PA"
 subtitle: "Stratified by socioeconomic class"
 format: html
 editor: visual
+editor_options: 
+  chunk_output_type: console
 ---
 
 ## Information
 
 This script contains the analyses for all four HUNT surveys without considering change in LTPA stratified by socioeconomic class. Through the analyses I have used own functions which is necessary for computing, see functions.qmd.
+
+These analyses are only done with the **quasi-continuous** variable. 
 
 ## Set environment and load packages
 
@@ -22,11 +26,10 @@ knitr::opts_chunk$set(
 
 ```{r}
 
-# Packages
-
 library(tidyverse)
 library(survival)
 library(purrr)
+library(patchwork)
 ```
 
 ## HUNT 1 - Survival Analysis
@@ -35,7 +38,7 @@ library(purrr)
 
 ```{r}
 
-hunt_1_cleaned_data_socio_strat <- hunt_1_cleaned_data |> 
+hunt_1_cleaned_data_cont_var_socio_strat <- hunt_1_cleaned_data_cont_var |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     education_level %in% c(
@@ -51,7 +54,7 @@ hunt_1_cleaned_data_socio_strat <- hunt_1_cleaned_data |>
     education_level %in% c(
       "Høyskole eller universitet, 4 år eller mer", 
       "Høyskole eller universitet, mindre enn 4 år"
-      )~ "high")
+      ) ~ "high")
     )
   )
 ```
@@ -62,9 +65,10 @@ Crude:
 
 ```{r}
 
-hunt_1_cox_reg_crude_socio_strat <- run_cox_reg_crude(
-  hunt_1_cleaned_data_socio_strat, 
-  socioeconomic_class
+run_cox_reg_crude(
+  hunt_1_cleaned_data_cont_var_socio_strat, 
+  socioeconomic_class,
+  pa_var = "pa_min_per_week"
   )
 ```
 
@@ -72,9 +76,10 @@ Multi-adjusted:
 
 ```{r}
 
-hunt_1_cox_reg_multi_socio_strat <- run_cox_reg_multi(
-  hunt_1_cleaned_data_socio_strat, 
-  socioeconomic_class
+run_cox_reg_multi(
+  hunt_1_cleaned_data_cont_var_socio_strat, 
+  socioeconomic_class,
+  pa_var = "pa_min_per_week"
   )
 ```
 
@@ -84,7 +89,7 @@ hunt_1_cox_reg_multi_socio_strat <- run_cox_reg_multi(
 
 ```{r}
 
-hunt_2_cleaned_data_socio_strat <- hunt_2_cleaned_data |> 
+hunt_2_cleaned_data_cont_var_socio_strat <- hunt_2_cleaned_data_cont_var |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     education_level %in% c(
@@ -108,9 +113,10 @@ Crude:
 
 ```{r}
 
-hunt_2_cox_reg_crude_socio_strat <- run_cox_reg_crude(
-  hunt_1_cleaned_data_socio_strat, 
-  socioeconomic_class
+run_cox_reg_crude(
+  hunt_2_cleaned_data_cont_var_socio_strat, 
+  socioeconomic_class,
+  pa_var = "pa_min_per_week"
   )
 ```
 
@@ -118,9 +124,10 @@ Multi-adjusted:
 
 ```{r}
 
-hunt_2_cox_reg_multi_socio_strat <- run_cox_reg_multi(
-  hunt_1_cleaned_data_socio_strat, 
-  socioeconomic_class
+run_cox_reg_multi(
+  hunt_2_cleaned_data_cont_var_socio_strat, 
+  socioeconomic_class,
+  pa_var = "pa_min_per_week"
   )
 ```
 
@@ -130,7 +137,7 @@ hunt_2_cox_reg_multi_socio_strat <- run_cox_reg_multi(
 
 ```{r}
 
-hunt_3_cleaned_data_socio_strat <- hunt_3_cleaned_data |> 
+hunt_3_cleaned_data_cont_var_socio_strat <- hunt_3_cleaned_data_cont_var |> 
   mutate(
     socioeconomic_class = as.factor(case_when(
     occupational_type %in% c(
@@ -159,9 +166,10 @@ Crude:
 
 ```{r}
 
-hunt_3_cox_reg_crude_socio_strat <- run_cox_reg_crude(
-  hunt_1_cleaned_data_socio_strat, 
-  socioeconomic_class
+run_cox_reg_crude(
+  hunt_3_cleaned_data_cont_var, 
+  socioeconomic_class,
+  pa_var = "pa_min_per_week"
   )
 ```
 
@@ -169,10 +177,11 @@ Multi-adjusted:
 
 ```{r}
 
-hunt_3_cox_reg_multi_socio_strat <- run_cox_reg_multi(
-  hunt_1_cleaned_data_socio_strat, 
-  socioeconomic_class
-  )
+run_cox_reg_multi(
+  hunt_3_cleaned_data_cont_var, 
+  socioeconomic_class,
+  pa_var = "pa_min_per_week"
+)
 ```
 
 ## HUNT 4 - Survival Analysis
@@ -181,7 +190,7 @@ hunt_3_cox_reg_multi_socio_strat <- run_cox_reg_multi(
 
 ```{r}
 
-hunt_4_cleaned_data_socio_strat <- hunt_4_cleaned_data |> 
+hunt_4_cleaned_data_cont_var_socio_strat <- hunt_4_cleaned_data_cont_var|> 
   mutate(
     socioeconomic_class = as.factor(case_when(
       educational_level %in% c(
@@ -206,19 +215,23 @@ Crude:
 
 ```{r}
 
-hunt_4_cox_reg_crude_socio_strat <- run_cox_reg_crude(
-  hunt_1_cleaned_data_socio_strat, 
-  socioeconomic_class
+run_cox_reg_crude(
+  hunt_4_cleaned_data_cont_var_socio_strat, 
+  socioeconomic_class,
+  pa_var = "pa_min_per_week"
   )
 ```
 
 Multi-adjusted:
 
+I get a warning here: Loglik converged before variable 5.
+
 ```{r}
 
-hunt_4_cox_reg_multi_socio_strat <- run_cox_reg_multi(
-  hunt_1_cleaned_data_socio_strat, 
-  socioeconomic_class
+run_cox_reg_multi(
+  hunt_4_cleaned_data_cont_var_socio_strat, 
+  socioeconomic_class,
+  pa_var = "pa_min_per_week"
   )
 ```
 
@@ -233,10 +246,10 @@ hunt_4_cox_reg_multi_socio_strat <- run_cox_reg_multi(
 # Create a vector of the dataframes 
 
 dataframes_socio_strat <- c(
-  "hunt_1_cleaned_data_socio_strat", 
-  "hunt_2_cleaned_data_socio_strat", 
-  "hunt_3_cleaned_data_socio_strat", 
-  "hunt_4_cleaned_data_socio_strat"
+  "hunt_1_cleaned_data_cont_var_socio_strat", 
+  "hunt_2_cleaned_data_cont_var_socio_strat",
+  "hunt_3_cleaned_data_cont_var_socio_strat",
+  "hunt_4_cleaned_data_cont_var_socio_strat"
   )
 
 # Create a vector of socioeconomic classes
@@ -250,7 +263,7 @@ socioeconomic_classes <- c(
 # Create vector of the covariates for the multi-adjusted model
 
 crude_covariates_socio_strat <- c(
-  "pa_hrs_per_week", 
+  "pa_min_per_week", 
   "age", 
   "follow_up_time_in_years", 
   "death_all_cause", 
@@ -290,11 +303,9 @@ calculate_person_years_follow_up_strat(
 
 ```{r}
 
-# Create vector of the covariates for the multi-adjusted model
-
 multi_adjusted_covariates_socio_strat <- c(
   "age", 
-  "pa_hrs_per_week", 
+  "pa_min_per_week", 
   "follow_up_time_in_years", 
   "death_all_cause", 
   "bp_systolic",
@@ -304,9 +315,6 @@ multi_adjusted_covariates_socio_strat <- c(
   "alcohol_usage", 
   "socioeconomic_class"
   )
-
-# We're re-using the dataframes vector and the socioeconomic class vector
-# created for the crude model
 ```
 
 #### Compute summary statistics
@@ -316,8 +324,8 @@ multi_adjusted_covariates_socio_strat <- c(
 # Number of participants
 
 calculate_num_of_participants(
-  dataframes = dataframes,
-  covariates = crude_covariates
+  dataframes = dataframes_socio_strat,
+  covariates = multi_adjusted_covariates_socio_strat
 )
 ```
 
@@ -326,8 +334,8 @@ calculate_num_of_participants(
 # Person-years follow-up
 
 calculate_person_years_follow_up(
-  dataframes = dataframes, 
-  covariates = crude_covariates
+  dataframes = dataframes_socio_strat, 
+  covariates = multi_adjusted_covariates_socio_strat
 )
 ```
 
@@ -336,8 +344,8 @@ calculate_person_years_follow_up(
 # Number of deaths
 
 calculate_num_of_deaths(
-  dataframes = dataframes,
-  covariates = crude_covariates
+  dataframes = dataframes_socio_strat,
+  covariates = multi_adjusted_covariates_socio_strat
 )
 ```
 

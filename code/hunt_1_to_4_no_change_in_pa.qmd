@@ -40,26 +40,25 @@ theme_set(theme_minimal())
 ```{r}
 
 hunt_1_cleaned_data_ltpa_index <- hunt_1_cleaned_full_data |> 
-  process_hunt_1_no_change_index()
+  process_hunt_1_no_change_ltpa_index()
 ```
-
 
 #### Visualizing LTPA index distribution
 
 ```{r}
 
-h1 <- hunt_1_cleaned_data |> 
+h1 <- hunt_1_cleaned_data_ltpa_index |> 
   ggplot(aes(x = ltpa_index)) +
   geom_histogram()
 
-h2 <- hunt_1_cleaned_data |>
+h2 <- hunt_1_cleaned_data_ltpa_index |>
   filter(ltpa_index > 0) |> 
   ggplot(aes(x = ltpa_index)) +
   geom_histogram()
 
 patchwork::wrap_plots(h1, h2)
 
-hunt_1_cleaned_data |> 
+hunt_1_cleaned_data_ltpa_index |> 
   count(ltpa_index)
 ```
 
@@ -69,14 +68,22 @@ Crude:
 
 ```{r}
 
-hunt_1_cox_reg_crude_ltpa_index <- run_cox_reg_crude(hunt_1_cleaned_data_ltpa_index, strata = NULL)
+hunt_1_cox_reg_crude_ltpa_index <- run_cox_reg_crude(
+  hunt_1_cleaned_data_ltpa_index, 
+  strata = NULL,
+  pa_var = "ltpa_index"
+)
 ```
 
 Multi-adjusted:
 
 ```{r}
 
-hunt_1_cox_reg_multi_ltpa_index <- run_cox_reg_multi(hunt_1_cleaned_data_ltpa_index, strata = NULL)
+hunt_1_cox_reg_multi_ltpa_index <- run_cox_reg_multi(
+  hunt_1_cleaned_data_ltpa_index, 
+  strata = NULL,
+  pa_var = "ltpa_index"
+  )
 ```
 
 ### Quasi-continuous variable (min/week)
@@ -115,25 +122,33 @@ Crude:
 
 ```{r}
 
-hunt_1_cox_reg_crude_cont_var <- run_cox_reg_crude(hunt_1_cleaned_data_cont_var, strata = NULL, pa_var = "pa_min_per_week")
+hunt_1_cox_reg_crude_cont_var <- run_cox_reg_crude(
+  hunt_1_cleaned_data_cont_var, 
+  strata = NULL, 
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 Multi-adjusted:
 
 ```{r}
 
-hunt_1_cox_reg_multi_cont_var <- run_cox_reg_multi(hunt_1_cleaned_data_cont_var, strata = NULL, "pa_min_per_week")
+hunt_1_cox_reg_multi_cont_var <- run_cox_reg_multi(
+  hunt_1_cleaned_data_cont_var, 
+  strata = NULL, 
+  "pa_min_per_week"
+  )
 ```
 
 ## HUNT 2 - Survival Analysis
 
-Due to the difference in how the LTPA questions are asked in HUNT 2, there are only model and that used a quasi-continuous variable (min/week).
+Due to the difference in how the LTPA questions are asked in HUNT 2, there are only one model that uses quasi-continuous variable (min/week).
 
 ### Quasi-continuous variable (min/week)
 
 #### Process data
 
-There are approx. 16 000 participants who lack a participation date and therefore follow-up time in HUNT 2. We compute a participation date for these individuals manually, see functions.qmd for more details. 
+There are approx. 16 000 participants who lack a participation date and therefore follow-up time in HUNT 2. We compute a participation date for these individuals manually, see functions.qmd for more details.
 
 ```{r}
 
@@ -166,19 +181,27 @@ Crude:
 
 ```{r}
 
-hunt_2_cox_reg_crude <- run_cox_reg_crude(hunt_2_cleaned_data_cont_var, strata = NULL, pa_var = "pa_min_per_week")
+hunt_2_cox_reg_crude <- run_cox_reg_crude(
+  hunt_2_cleaned_data_cont_var, 
+  strata = NULL, 
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 Multi-adjusted:
 
 ```{r}
 
-hunt_2_cox_reg_multi <- run_cox_reg_multi(hunt_2_cleaned_data_cont_var, strata = NULL, pa_var = "pa_min_per_week")
+hunt_2_cox_reg_multi <- run_cox_reg_multi(
+  hunt_2_cleaned_data_cont_var, 
+  strata = NULL, 
+  pa_var = "pa_min_per_week"
+  )
 ```
 
 ## HUNT 3 - Survival Analysis
 
-There are approx. 25 000 individuals who lack a participation date, these are computed manually. See "functions.qmd". 
+There are approx. 25 000 individuals who lack a participation date, these are computed manually. See "functions.qmd".
 
 ### LTPA index variable
 
@@ -187,7 +210,7 @@ There are approx. 25 000 individuals who lack a participation date, these are co
 ```{r}
 
 hunt_3_cleaned_data_ltpa_index <- hunt_3_cleaned_full_data |> 
-  process_hunt_3_no_change_index()
+  process_hunt_3_no_change_ltpa_index()
 ```
 
 #### Visualizing distribution
@@ -392,122 +415,176 @@ hunt_4_cox_reg_multi_cont_var <- run_cox_reg_multi(
 
 ## Summary statistics from the models
 
-### Crude model
+### Number of participants
 
-#### Create vectors with data frames and covariates
+#### LTPA index variable
 
-```{r}
-
-# Create a vector of the dataframes 
-
-dataframes <- c(
-  "hunt_1_cleaned_data", 
-  "hunt_2_cleaned_data", 
-  "hunt_3_cleaned_data", 
-  "hunt_4_cleaned_data"
-)
-
-# Create vector of the covariates for the multi-adjusted model
-
-crude_covariates <- c(
-  "follow_up_time_in_years", 
-  "death_all_cause", 
-  "age", 
-  "pa_hrs_per_week"
-)
-```
-
-#### Compute summary statistics
+Create a vector for the data frames and the covariates for both crude and multi-adjusted model:
 
 ```{r}
 
-# Number of participants
-
-calculate_num_of_participants(
-  dataframes = dataframes,
-  covariates = crude_covariates
+ltpa_index_dataframes <- c(
+  "hunt_1_cleaned_data_ltpa_index",
+  "hunt_3_cleaned_data_ltpa_index",
+  "hunt_4_cleaned_data_ltpa_index"
 )
-```
 
-```{r}
-
-# Person-years follow-up
-
-calculate_person_years_follow_up(
-  dataframes = dataframes, 
-  covariates = crude_covariates
+crude_covariates_ltpa_index <- c(
+  "death_all_cause",
+  "follow_up_time_in_years",
+  "age",
+  "ltpa_index"
 )
-```
 
-```{r}
-
-# Number of deaths
-
-calculate_num_of_deaths(
-  dataframes = dataframes,
-  covariates = crude_covariates
-)
-```
-
-### Multi-adjusted model
-
-#### Create vectors with data frames and covariates
-
-```{r}
-
-# Create vector of the covariates for the multi-adjusted model
-
-multi_adjusted_covariates <- c(
-  "age", 
-  "pa_hrs_per_week", 
-  "follow_up_time_in_years", 
-  "death_all_cause", 
-  "bp_systolic",
-  "bmi", 
-  "smo_status", 
+multi_adjusted_covariates_ltpa_index <- c(
+  "follow_up_time_in_years",
+  "death_all_cause",
+  "age",
   "sex", 
-  "alcohol_usage"
+  "ltpa_index", # This is the variable that varies between the models
+  "alcohol_usage",
+  "bmi", 
+  "bp_systolic",
+  "smo_status"
 )
-
-# We're re-using the data frames vector created for the crude model
 ```
 
-```{r}
+##### Calculate number of participants
 
-# Number of participants
+Crude:
+
+```{r}
 
 calculate_num_of_participants(
-  dataframes = dataframes,
-  covariates = multi_adjusted_covariates
+  ltpa_index_dataframes,
+  crude_covariates_ltpa_index
+)
+```
+
+Multi-adjusted:
+
+```{r}
+
+calculate_num_of_participants(
+  ltpa_index_dataframes,
+  multi_adjusted_covariates_ltpa_index
+)
+```
+
+#### Quasi-continuous PA variable
+
+```{r}
+
+cont_var_dataframes <- c(
+  "hunt_1_cleaned_data_cont_var",
+  "hunt_2_cleaned_data_cont_var",
+  "hunt_3_cleaned_data_cont_var",
+  "hunt_4_cleaned_data_cont_var"
+)
+
+crude_covariates_cont_var <- c(
+  "death_all_cause",
+  "follow_up_time_in_years",
+  "age",
+  "pa_min_per_week"
+)
+
+multi_adjusted_covariates_cont_var <- c(
+  "follow_up_time_in_years",
+  "death_all_cause",
+  "age",
+  "sex", 
+  "pa_min_per_week", # This is the variable that varies between the models
+  "alcohol_usage",
+  "bmi", 
+  "bp_systolic",
+  "smo_status"
+)
+```
+
+##### Calculate number of participants
+
+```{r}
+
+calculate_num_of_participants(
+  cont_var_dataframes,
+  crude_covariates_cont_var
 )
 ```
 
 ```{r}
 
-# Person-years follow-up
-
-calculate_person_years_follow_up(
-  dataframes = dataframes, 
-  covariates = multi_adjusted_covariates
+calculate_num_of_participants(
+  cont_var_dataframes,
+  multi_adjusted_covariates_cont_var
 )
 ```
 
-```{r}
+### Number of deaths
 
-# Number of deaths
+#### LTPA index variable
+
+Crude:
+
+```{r}
 
 calculate_num_of_deaths(
-  dataframes = dataframes,
-  covariates = multi_adjusted_covariates
+  ltpa_index_dataframes,
+  crude_covariates_ltpa_index
 )
 ```
+
+Multi-adjusted:
+
+```{r}
+
+calculate_num_of_deaths(
+  ltpa_index_dataframes,
+  multi_adjusted_covariates_ltpa_index
+)
+```
+
+#### Quasi-continuous variable
+
+Crude:
+
+```{r}
+
+calculate_num_of_deaths(
+  cont_var_dataframes,
+  crude_covariates_cont_var
+)
+```
+
+Multi-adjusted:
+
+```{r}
+
+calculate_num_of_deaths(
+  cont_var_dataframes,
+  multi_adjusted_covariates_cont_var
+)
+```
+
+### Follow-up time
+
+#### LTPA index variable
+
+```{r}
+
+calculate_person_years_follow_up(
+  ltpa_index_dataframes,
+  crude_covariates_ltpa_index
+)
+```
+
+#### Quasi-continuous PA variable
 
 ### Combine all data from the models in a tibble
 
 This is done for readability.
 
 ```{r}
-
 
 tibble(
   survey = c("HUNT 1", "HUNT 2", "HUNT 3", "HUNT 4"),
@@ -519,8 +596,6 @@ tibble(
   ci_low = c(1.030, 0.933, 0.928, 0.822),
   ci_high = c(1.050, 0.958, 0.968, 0.945)
 )
-
-# Crude model
 
 tibble(
   survey = c("HUNT 1", "HUNT 2", "HUNT 3", "HUNT 4"),
