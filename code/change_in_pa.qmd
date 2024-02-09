@@ -1,0 +1,73 @@
+---
+title: "Physical Activity Index"
+subtitle: "HUNT 1-4, change in PA"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Information
+
+This script contains the analyses for change in LTPA across H1-H3-H4.
+
+Due to different phrasing of the PA questions in HUNT 2, these analyses **will only consider longitudinal trends from H1-H3-H4**. That is, across four decades, with 10 years between 10 years between H3-H4, 22 years between H1-H3 and 32 years between H1-H3-H4.
+
+## Set environment and load packages
+
+```{r setup}
+
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r}
+
+library(tidyverse)
+library(survival)
+library(purrr)
+library(patchwork)
+```
+
+## Longitudinal trends across H1-H3-H4
+
+**Spørsmål til Mats**:
+
+1.  Må man begrense oppfølgingstid når man f.eks. ser på H1-H3?
+2.  Nå har jeg filtrert ut på part_dat-variablene, er det standard praksis hos dere?
+3.  I f.eks. H1-H3 må man lage en PA-gruppe for hvert individ til hver undersøkelse for å studere endring i FA. Hvordan gjør man det med andre kovariater? Bruker man alkoholforbruk både i H1 og H3, eller bruker man bare den ene?
+4. 
+
+### Process data
+
+In order to perform the analyses, we must filter out participants as follows:
+
+-   H3-H4: Participants who have data in H3 and H4.
+-   H1-H3: Participants who have data in H1 and H3.
+-   H1-H3-H4: Participants who have data in H1, H3 and H4.
+
+These operations are in **data_preparation.qmd**
+
+There functions for cleaning the data is in **functions.qmd**.
+
+#### H1-H3
+
+```{r}
+
+```
+
+#### H1-H3-H3
+
+```{r}
+
+
+```
+
+#### H3-H4
+
+```{r}
+
+
+```

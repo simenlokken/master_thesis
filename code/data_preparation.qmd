@@ -146,27 +146,223 @@ hunt_4_cleaned_full_data <- full_cleaned_data |>
 
 #### Data frames for change in LTPA
 
-##### HUNT 3-4
+**Notice that I have performed some string manipulation in HUNT 1 and 3 so we can effectively apply the LTPA grouping function for the analysed related to change. In addition, the exercise variables is ordered factors so we can use relational operators such as >= on them.**
 
 ```{r}
 
-hunt_3_4 <- full_cleaned_data |> 
-  select(contains(match = c("nt3", "nt4"))) |> 
-  filter(
-    !is.na(part_nt3blq1) & !is.na(part_nt3blm) & !is.na(part_nt4blm)
-    )
+dur_levels = c(
+  "Mindre enn 15 minutter",
+  "15-29 minutter",
+  "30-60 minutter",
+  "Mer enn 60 minutter"
+)
+
+freq_levels = c(
+  "Aldri", 
+  "En gang i uka",
+  "2-3 ganger per uke",
+  "Omtrent hver dag"
+)
+
+int_levels = c(
+  "Tar det rolig uten å bli andpusten eller svett",
+  "Tar det så hardt at jeg blir andpusten og svett",
+  "Tar meg nesten helt ut"
+)
 ```
 
-##### HUNT 1-3-4
+#### HUNT 1-3
 
 ```{r}
 
-hunt_1_3_4 <- full_cleaned_data |> 
-  select(contains(match = c("nt1", "nt3", "nt4"))) |> 
+hunt_1_3_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = c("nt1", "nt3")), end_date_death, death_all, age, sex) |> 
   filter(
-    !is.na(part_nt1blq2) & !is.na(part_nt1blm) & !is.na(part_nt3blq1) & !is.na(part_nt3blq1) & !is.na(part_nt4blm)
+    !is.na(part_nt1blq2) & !is.na(part_nt1blm) & !is.na(part_nt3blq1) & !is.na(part_nt3blq1)
+  ) |> 
+  mutate(
+    
+    # HUNT 1
+    
+    exe_du_nt1blq2 = case_when(
+      exe_du_nt1blq2 == "16-30 minutter" ~ "15-29 minutter",
+      exe_du_nt1blq2 == "30 minutter-1 time" ~ "30-60 minutter",
+      exe_du_nt1blq2 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt1blq2
+    ),
+    exe_f_nt1blq2 = factor(
+      exe_f_nt1blq2,
+      levels = freq_levels,
+      ordered = TRUE
+      ),
+    exe_du_nt1blq2 = factor(
+      exe_du_nt1blq2,
+      levels = dur_levels,
+      ordered = TRUE
+    ),
+    exe_int_nt1blq2 = factor(
+      exe_int_nt1blq2,
+      levels = int_levels,
+      ordered = TRUE
+      ),
+    
+    # HUNT 3
+    
+    exe_du_nt3blq1 = case_when(
+      exe_du_nt3blq1 == "30 minutter - 1 time" ~ "30-60 minutter",
+      exe_du_nt3blq1 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt3blq1
+    ),
+    exe_f_nt3blq1 = factor(
+      exe_f_nt3blq1,
+      levels = freq_levels,
+      ordered = TRUE
+    ),
+    exe_du_nt3blq1 = factor(
+      exe_du_nt3blq1,
+      levels = dur_levels,
+      ordered = TRUE
+    ),
+    exe_int_nt3blq1 = factor(
+      exe_int_nt3blq1,
+      levels = int_levels,
+        ordered = TRUE
+    )
   )
 ```
+
+#### HUNT 1-3-4
+
+```{r}
+
+hunt_1_3_4_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = c("nt1", "nt3", "nt4")), end_date_death, death_all, age, sex) |> 
+  filter(
+    !is.na(part_nt1blq2) & !is.na(part_nt1blm) & !is.na(part_nt3blq1) & !is.na(part_nt3blq1) & !is.na(part_nt4blm)
+  ) |> 
+  
+  # HUNT 1
+  
+  mutate(
+    exe_du_nt1blq2 = case_when(
+      exe_du_nt1blq2 == "16-30 minutter" ~ "15-29 minutter",
+      exe_du_nt1blq2 == "30 minutter-1 time" ~ "30-60 minutter",
+      exe_du_nt1blq2 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt1blq2
+    ),
+    exe_f_nt1blq2 = factor(
+      exe_f_nt1blq2,
+      levels = freq_levels,
+      ordered = TRUE
+      ),
+    exe_du_nt1blq2 = factor(
+      exe_du_nt1blq2,
+      levels = dur_levels,
+      ordered = TRUE
+    ),
+    exe_int_nt1blq2 = factor(
+      exe_int_nt1blq2,
+      levels = int_levels,
+      ordered = TRUE
+      ),
+    
+    # HUNT 3
+    
+    exe_du_nt3blq1 = case_when(
+      exe_du_nt3blq1 == "30 minutter - 1 time" ~ "30-60 minutter",
+      exe_du_nt3blq1 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt3blq1
+    ),
+    exe_f_nt3blq1 = factor(
+      exe_f_nt3blq1,
+      levels = freq_levels,
+      ordered = TRUE
+    ),
+    exe_du_nt3blq1 = factor(
+      exe_du_nt3blq1,
+      levels = dur_levels,
+      ordered = TRUE
+    ),
+    exe_int_nt3blq1 = factor(
+      exe_int_nt3blq1,
+      levels = int_levels,
+        ordered = TRUE
+    ),
+    
+    # HUNT 4
+    
+    exe_du_nt4blq1 = factor(
+      exe_du_nt4blq1,
+      levels = dur_levels,
+      ordered = TRUE
+    ),
+    exe_f_nt4blq1 = factor(
+      exe_f_nt4blq1,
+      levels = freq_levels,
+      ordered = TRUE
+      ),
+    exe_int_nt4blq1 = factor(
+      exe_int_nt4blq1,
+      levels = int_levels,
+      ordered = TRUE
+    )
+  )
+```
+
+#### HUNT 3-4
+
+```{r}
+
+hunt_3_4_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = c("nt3", "nt4")), end_date_death, death_all, age, sex) |> 
+  filter(
+    !is.na(part_nt3blq1) & !is.na(part_nt3blm) & !is.na(part_nt4blm)
+    ) |> 
+  mutate(
+    
+    # HUNT 3
+    
+   exe_du_nt3blq1 = case_when(
+      exe_du_nt3blq1 == "30 minutter - 1 time" ~ "30-60 minutter",
+      exe_du_nt3blq1 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt3blq1
+    ),
+    exe_f_nt3blq1 = factor(
+      exe_f_nt3blq1,
+      levels = freq_levels,
+      ordered = TRUE
+    ),
+    exe_du_nt3blq1 = factor(
+      exe_du_nt3blq1,
+      levels = dur_levels,
+      ordered = TRUE
+    ),
+    exe_int_nt3blq1 = factor(
+      exe_int_nt3blq1,
+      levels = int_levels,
+        ordered = TRUE
+    ),
+    
+    # HUNT 4
+    
+    exe_du_nt4blq1 = factor(
+      exe_du_nt4blq1,
+      levels = dur_levels,
+      ordered = TRUE
+    ),
+    exe_f_nt4blq1 = factor(
+      exe_f_nt4blq1,
+      levels = freq_levels,
+      ordered = TRUE
+      ),
+    exe_int_nt4blq1 = factor(
+      exe_int_nt4blq1,
+      levels = int_levels,
+      ordered = TRUE
+    )
+  )
+```
+
 
 
 

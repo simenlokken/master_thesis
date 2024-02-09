@@ -1,0 +1,189 @@
+---
+title: "HUNT 1-4: No change in PA"
+author: "3 year delay for registration"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Information
+
+This script contains the analyses for all four HUNT surveys without considering change in LTPA stratified by socioeconomic class while having a delay on follow-up in 3 years. Naturally, due to the short follow-up time in HUNT 4, that analysis is excluded.
+
+Through the analyses I have used own functions which is necessary for computing, see functions.qmd.
+
+## Set environment and load packages
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+```{r}
+
+library(tidyverse)
+library(survival)
+```
+
+## HUNT 1 - Survival Analysis
+
+### Process data
+
+```{r}
+
+hunt_1_cleaned_data_3_yrs_delay <- full_cleaned_data |> 
+  process_hunt_1_no_change() |>
+  select(
+    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
+  ) |> 
+  drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+    education_level %in% c(
+      "7-årig folkeskole eller kortere",
+      "9-årig grunnskole", 
+      "Real- eller middelskole, grunnskolen 10.år",
+      "Framhalds- eller fortsettelsesskole"
+      ) ~ "low",
+    education_level %in% c(
+      "Ett- eller toårig videregående skole",
+      "Artium, økonomisk gymnas eller almenfaglig retning i vgs."
+      ) ~ "medium",
+    education_level %in% c(
+      "Høyskole eller universitet, 4 år eller mer", 
+      "Høyskole eller universitet, mindre enn 4 år"
+      )~ "high")
+    )
+  ) |> 
+  filter(
+    follow_up_time_in_years >= 3
+  )
+```
+
+### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_1_cox_reg_crude_3_yrs_delay <- run_cox_reg_crude(hunt_1_cleaned_data_3_yrs_delay, strata = socioeconomic_class)
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_1_cox_reg_crude_3_yrs_delay <- run_cox_reg_multi(hunt_1_cleaned_data_3_yrs_delay, strata = socioeconomic_class)
+```
+
+## HUNT 2 - Survival Analysis
+
+### Process data
+
+```{r}
+
+hunt_2_cleaned_data_3_yrs_delay <- full_cleaned_data |> 
+  process_hunt_2_no_change() |> 
+  select(
+    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
+  ) |>
+  drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+    education_level %in% c(
+      "Grunnskole 7-10 år, framhaldsskole, folkehøgskole"
+      ) ~ "low",
+    education_level %in% c(
+      "Artium, øk.gymnas, allmennfaglig retning i videregående skole", 
+      "Realskole, middelskole, yrkesskole 1-2 årig videregående skole"
+      ) ~ "medium",
+    education_level %in% c(
+      "Høgskole/universitet, 4 år eller mer", 
+      "Høgskole/universitet, mindre enn 4 år"
+      ) ~ "high")
+    )
+  ) |> 
+  filter(
+    follow_up_time_in_years >= 3
+  )
+```
+
+### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_2_cox_reg_crude_3_yrs_delay <- run_cox_reg_crude(hunt_2_cleaned_data_3_yrs_delay, strata = socioeconomic_class)
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_2_cox_reg_crude_3_yrs_delay <- run_cox_reg_multi(hunt_2_cleaned_data_3_yrs_delay, strata = socioeconomic_class)
+```
+
+## HUNT 3 - Survival Analysis
+
+### Process data
+
+```{r}
+
+hunt_3_cleaned_data_3_yrs_delay <- full_cleaned_data |> 
+  process_hunt_3_no_change() |> 
+  select(
+    -c(heavy_physical_work) # Not necessary for computation, so it only limits statistical power. Therefore, removed
+  ) |>
+  drop_na() |> # All NA's dropped because the same participants has to be included in the crude and multi-adjusted model
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+    occupational_type %in% c(
+      "Yrker uten krav til utdanning", 
+      "Yrker innen jordbruk, skogbruk og fiske",
+      "Prosess- og maskinoperatører, transportarbeidere mv."
+      ) ~ "low",
+    occupational_type %in% c(
+      "Kontor- og kundeserviceyrker", 
+      "Salgs-, service- og omsorgsyrker", 
+      "Håndverkere o.l.", 
+      "Militære yrker og uoppgitt"
+      ) ~ "medium",
+    occupational_type %in% c(
+      "Administrative ledere og politikere", 
+      "Akademiske yrker", 
+      "Yrker med kortere høyskole- og universitetsutdanning og teknikere"
+      ) ~ "high")
+    )
+  ) |>
+  filter(
+    follow_up_time_in_years >= 3
+  )
+```
+
+### Run Cox models
+
+Crude:
+
+```{r}
+
+hunt_3_cox_reg_crude_3_yrs_delay <- run_cox_reg_crude(hunt_3_cleaned_data_3_yrs_delay, strata = socioeconomic_class)
+```
+
+Multi-adjusted:
+
+```{r}
+
+hunt_3_cox_reg_crude_3_yrs_delay <- run_cox_reg_multi(hunt_3_cleaned_data_3_yrs_delay, strata = socioeconomic_class)
+```
+
+
+
+
+
+
+

@@ -2,10 +2,6 @@
 
 library(tidyverse)
 
-# Source HUNT data
-
-source("code/functions.R")
-
 # Number of daily smokers, all surveys
 
 count_daily_smokers <- function(dataframe) {
