@@ -1,0 +1,302 @@
+---
+title: "Data preparation"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Information
+
+This script is a general preparation for the data. It retrieves the data and does some basic processing. In addition, it distinguished the data from the different surveys and saves them in separate data frames.
+
+## Set environment and load packages
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(
+  message = FALSE,
+  warning = FALSE,
+  echo = TRUE
+)
+```
+
+```{r}
+
+library(dplyr)
+library(tibble)
+library(lubridate)
+library(arrow)
+```
+
+## Load data
+
+```{r}
+
+full_data <- read_parquet("//fil.nice.ntnu.no/nice/p758/Data master/full_data.parquet")
+```
+
+## Process data
+
+### Basic processing
+
+Un-capitazing names, change variable types and create date-time objects.
+
+```{r}
+
+# Un-capitalize and clean names
+
+full_cleaned_data <- full_data |> 
+  janitor::clean_names()
+
+# Remove initial data frame
+
+rm(full_data)
+
+# Change from chr to fct
+
+full_cleaned_data <- full_cleaned_data |>
+  mutate_if(is.character, as.factor)
+
+# Manually change actual chr back to fct again
+
+full_cleaned_data <- full_cleaned_data |> 
+  mutate(
+    birth_date = as.character(birth_date), 
+    end_date_death = as.character(end_date_death),
+    end_date_icd8910 = as.character(end_date_icd8910),
+    end_date_link = as.character(end_date_link),
+    w22_0389_lopenr_person = as.character(w22_0389_lopenr_person),
+    death_all = as.factor(death_all),
+    death_all_icd = as.factor(death_all_icd),
+    death_cvd = as.factor(death_cvd),
+    death_ihd = as.factor(death_ihd),
+    death_stroke = as.factor(death_stroke),
+    death_ihd = as.factor(death_ihd)
+    )
+
+# Create date objects
+
+full_cleaned_data <- full_cleaned_data |> 
+  mutate(
+    part_dat_nt1blq1 = dmy(part_dat_nt1blq1),
+    part_dat_nt2blq1 = dmy(part_dat_nt2blq1),
+    part_dat_nt3blq1 = dmy(part_dat_nt3blq1),
+    part_dat_nt4blq1 = dmy(part_dat_nt4blq1),
+    end_date_death = dmy(end_date_death),
+    end_date_link = dmy(end_date_link),
+    end_date_icd8910 = dmy(end_date_icd8910),
+    eof_date_death = dmy(eof_date_death)
+  )
+
+# Compute participant age
+
+full_cleaned_data <- full_cleaned_data |> 
+  mutate(age = year(end_date_death) - birth_year)
+```
+
+### Distinguish different HUNT surveys into separate data frames
+
+#### Data frames for no change in LTPA
+
+Since all the data for all four surveys are in one data set, we have to distinguish them into four separate data sets.
+
+Each survey has two variables called BLM and a variable related to each sub-survey. We use these to distinguish.
+
+#### HUNT 1
+
+Q2 is the relevant Q for H1, it contains data on exercise, work, education, smoking and alcohol
+
+```{r}
+
+hunt_1_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = "nt1"), age, sex, end_date_death, death_all) |> 
+  filter(!is.na(part_nt1blq2) & !is.na(part_nt1blm))
+```
+
+#### HUNT 2
+
+Q1 is the relevant for Q for H2, it contains data on exercise, work, education, smoking and alcohol
+
+```{r}
+
+hunt_2_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = "nt2"), age, sex, end_date_death, death_all) |> 
+  filter(!is.na(part_nt2blq1) & !is.na(part_nt2blm))
+```
+
+#### HUNT 3
+
+Q1 is the relevant for Q for H3, it contains data on exercise, work, education, smoking and alcohol
+
+```{r}
+
+hunt_3_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = "nt3"), age, sex, end_date_death, death_all) |> 
+  filter(!is.na(part_nt3blq1) & !is.na(part_nt3blm))
+```
+
+#### HUNT 4
+
+Have no information on the surveys, so just did a filtering on baseline measurements (i.e, blm variable)
+
+```{r}
+
+hunt_4_cleaned_full_data <- full_cleaned_data |>
+  select(contains(match = "nt4"), age, sex, end_date_death, death_all) |> 
+  filter(!is.na(part_nt4blm))
+```
+
+#### Data frames for change in LTPA
+
+Each data frame is being written to a .parquet at the end of each processing process.
+
+First of all, we create a function that converts the strings into factors represented as integers for easy manipulation later in complex case_when statements with logical operators:
+
+```{r}
+
+convert_string_fct_to_integer_fct <- function(dataframe, var_exe_f, var_exe_du, var_exe_int) {
+  dataframe <- dataframe |> 
+    mutate(
+      !!sym(var_exe_f) := case_when(
+        !!sym(var_exe_f) == "Aldri" ~ 1,
+        !!sym(var_exe_f) == "Sjeldnere enn en gang i uka" ~ 2,
+        !!sym(var_exe_f) == "En gang i uka" ~ 3,
+        !!sym(var_exe_f) == "2-3 ganger i uka" ~ 4,
+        !!sym(var_exe_f) == "Omtrent hver dag" ~ 5
+      ),
+      !!sym(var_exe_du) := case_when(
+        !!sym(var_exe_du) == "Mindre enn 15 minutter" ~ 1,
+        !!sym(var_exe_du) == "15-29 minutter" ~ 2,
+        !!sym(var_exe_du) == "30-60 minutter" ~ 3,
+        !!sym(var_exe_du) == "Mer enn 60 minutter" ~ 4
+      ),
+      !!sym(var_exe_int) := case_when(
+        !!sym(var_exe_int) == "Tar det rolig uten å bli andpusten eller svett" ~ 1,
+        !!sym(var_exe_int) == "Tar det så hardt at jeg blir andpusten og svett" ~ 2,
+        !!sym(var_exe_int) == "Tar meg nesten helt ut" ~ 3
+      )
+    )
+  return(dataframe)
+}
+```
+
+#### HUNT 1-3
+
+We have to do some string manipulation for H1 and H3 due to different phrasing compared to H4.
+
+```{r}
+
+hunt_1_3_cleaned_full_cleaned_data <- full_cleaned_data |> 
+  select(contains(match = c("nt1", "nt3")), end_date_death, death_all, age, sex) |> 
+  filter(
+    !is.na(part_nt1blq2) & !is.na(part_nt1blm) & !is.na(part_nt3blq1) & !is.na(part_nt3blq1)
+    ) |> 
+   mutate(
+    exe_du_nt1blq2 = case_when(
+      exe_du_nt1blq2 == "16-30 minutter" ~ "15-29 minutter",
+      exe_du_nt1blq2 == "30 minutter-1 time" ~ "30-60 minutter",
+      exe_du_nt1blq2 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt1blq2
+    ),
+    exe_du_nt3blq1 = case_when(
+      exe_du_nt3blq1 == "30 minutter - 1 time" ~ "30-60 minutter",
+      exe_du_nt3blq1 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt3blq1
+    )
+   ) |> 
+  convert_string_fct_to_integer_fct(
+    "exe_f_nt1blq2",
+    "exe_du_nt1blq2",
+    "exe_int_nt1blq2"
+  ) |> 
+  convert_string_fct_to_integer_fct(
+    "exe_f_nt3blq1",
+    "exe_du_nt3blq1",
+    "exe_int_nt3blq1"
+  )
+
+# write_parquet(
+#   hunt_1_3_cleaned_full_data,
+#   "//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_cleaned_full_data.parquet"
+#   )
+```
+
+#### HUNT 1-3-4
+
+```{r}
+
+hunt_1_3_4_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = c("nt1", "nt3", "nt4")), end_date_death, death_all, age, sex) |> 
+  filter(
+    !is.na(part_nt1blq2) & !is.na(part_nt1blm) 
+    & !is.na(part_nt3blq1) & !is.na(part_nt3blq1)
+    & !is.na(part_nt4blm)
+    ) |> 
+   mutate(
+    exe_du_nt1blq2 = case_when(
+      exe_du_nt1blq2 == "16-30 minutter" ~ "15-29 minutter",
+      exe_du_nt1blq2 == "30 minutter-1 time" ~ "30-60 minutter",
+      exe_du_nt1blq2 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt1blq2
+    ),
+    exe_du_nt3blq1 = case_when(
+      exe_du_nt3blq1 == "30 minutter - 1 time" ~ "30-60 minutter",
+      exe_du_nt3blq1 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt3blq1
+    )
+   ) |> 
+  convert_string_fct_to_integer_fct(
+    "exe_f_nt1blq2",
+    "exe_du_nt1blq2",
+    "exe_int_nt1blq2"
+  ) |> 
+  convert_string_fct_to_integer_fct(
+    "exe_f_nt3blq1",
+    "exe_du_nt3blq1",
+    "exe_int_nt3blq1"
+  ) |> 
+  convert_string_fct_to_integer_fct(
+    "exe_f_nt4blq1",
+    "exe_du_nt4blq1",
+    "exe_int_nt4blq1"
+  )
+
+# write_parquet(
+#   hunt_1_3_4_cleaned_full_data,
+#   "//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_4_cleaned_full_data.parquet"
+#   )
+```
+
+#### HUNT 3-4
+
+```{r}
+
+hunt_3_4_cleaned_full_data <- full_cleaned_data |> 
+  select(contains(match = c("nt3", "nt4")), end_date_death, death_all, age, sex) |> 
+  filter(
+    !is.na(part_nt3blq1) & !is.na(part_nt3blq1) & !is.na(part_nt4blm)
+    ) |> 
+   mutate(
+    exe_du_nt3blq1 = case_when(
+      exe_du_nt3blq1 == "30 minutter - 1 time" ~ "30-60 minutter",
+      exe_du_nt3blq1 == "Mer enn 1 time" ~ "Mer enn 60 minutter",
+      .default = exe_du_nt3blq1
+    )
+   ) |> 
+  convert_string_fct_to_integer_fct(
+    "exe_f_nt3blq1",
+    "exe_du_nt3blq1",
+    "exe_int_nt3blq1"
+  ) |> 
+  convert_string_fct_to_integer_fct(
+    "exe_f_nt4blq1",
+    "exe_du_nt4blq1",
+    "exe_int_nt4blq1"
+  )
+
+# write_parquet(
+#   hunt_3_4_cleaned_full_data,
+#   "//fil.nice.ntnu.no/nice/p758/Data master/hunt_3_4_cleaned_full_data.parquet"
+#   )
+```
