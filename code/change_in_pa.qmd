@@ -1,0 +1,126 @@
+---
+title: "Physical Activity Index"
+subtitle: "HUNT 1-4, change in PA"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Information
+
+This script contains the analyses for change in LTPA across H1-H3-H4.
+
+Due to different phrasing of the PA questions in HUNT 2, these analyses **will only consider longitudinal trends from H1-H3-H4**. That is, across four decades, with 10 years between 10 years between H3-H4, 22 years between H1-H3 and 32 years between H1-H3-H4.
+
+## Set environment and load packages
+
+```{r setup}
+
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r}
+
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(lubridate)
+library(readr)
+library(forcats)
+library(survival)
+library(patchwork)
+```
+
+## Longitudinal trends across H1-H3-H4
+
+### Process data
+
+In order to perform the analyses, we must filter out participants as follows:
+
+-   H3-H4: Participants who have LTPA data in H3 and H4.
+-   H1-H3: Participants who have LTPA data in H1 and H3.
+-   H1-H3-H4: Participants who have LTPA data in H1, H3 and H4.
+
+These operations are in **data_preparation.qmd**
+
+Then, we must used their exercise data to create LTPA groups. 
+
+The process of differentiating participants into LTPA groups are done in Stata. Code can be located in the same GitHub repository as the rest of the code. Therefore, we will only load in a .csv file that's been processed in Stata and do the analyses on those.
+
+#### H1-H3
+
+Load data that's been processed in Stata:
+
+```{r}
+
+hunt_1_3_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_cleaned_full_data.csv")
+```
+
+Process data that's been lost in the Stata process:
+
+```{r}
+
+glimpse(hunt_1_3_cleaned_full_data)
+
+hunt_1_3_cleaned_full_data <- hunt_1_3_cleaned_full_data |> 
+  mutate(
+    ltpa_index_nt1 = as_factor(ltpa_index_nt1),
+    ltpa_group_nt1 = as_factor(ltpa_group_nt1),
+    ltpa_index_nt3 = as_factor(ltpa_index_nt3),
+    ltpa_group_nt3 = as_factor(ltpa_group_nt3)
+  )
+```
+
+#### H1-H3-H4
+
+Load data that's been processed in Stata:
+
+```{r}
+
+hunt_1_3_4_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_4_cleaned_full_data.csv")
+```
+
+Process data that's been lost in the Stata process:
+
+```{r}
+
+glimpse(hunt_1_3_4_cleaned_full_data)
+
+hunt_1_3_4_cleaned_full_data <- hunt_1_3_4_cleaned_full_data |> 
+  mutate(
+    ltpa_index_nt1 = as_factor(ltpa_index_nt1),
+    ltpa_group_nt1 = as_factor(ltpa_group_nt1),
+    ltpa_index_nt3 = as_factor(ltpa_index_nt3),
+    ltpa_group_nt3 = as_factor(ltpa_group_nt3),
+    ltpa_index_nt4 = as_factor(ltpa_index_nt4),
+    ltpa_group_nt4 = as_factor(ltpa_group_nt4)
+  )
+```
+
+#### H3-H4
+
+```{r}
+
+hunt_3_4_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/Data master/hunt_3_4_cleaned_full_data.csv")
+```
+
+Process data that's been lost in the Stata process:
+
+```{r}
+
+glimpse(hunt_3_4_cleaned_full_data)
+
+hunt_3_4_cleaned_full_data <- hunt_3_4_cleaned_full_data |> 
+  mutate(
+    ltpa_index_nt3 = as_factor(ltpa_index_nt3),
+    ltpa_group_nt3 = as_factor(ltpa_group_nt3),
+    ltpa_index_nt4 = as_factor(ltpa_index_nt4),
+    ltpa_group_nt4 = as_factor(ltpa_group_nt4)
+  )
+
+```
+

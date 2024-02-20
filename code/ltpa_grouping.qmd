@@ -1,0 +1,195 @@
+---
+title: "LTPA grouping"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Information
+
+This script is a working script for checking the conditional logic for LTPA grouping.
+
+## Set environment and load packages
+
+```{r setup}
+
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r}
+
+library(dplyr)
+library(readr)
+```
+
+## Test conditional logic from R
+
+### H1-H3
+
+```{r}
+
+hunt_1_3_cleaned_full_data |> 
+  apply_ltpa_grouping(
+    "ltpa_index_nt1",
+    "ltpa_group_nt1",
+    "exe_f_nt1blq2",
+    "exe_du_nt1blq2",
+    "exe_int_nt1blq2"
+  ) |> 
+  select(
+    exe_f_nt1blq2, exe_du_nt1blq2, exe_int_nt1blq2, ltpa_index_nt1, ltpa_group_nt1
+  ) |>
+  filter(
+    is.na(ltpa_index_nt1) & is.na(ltpa_group_nt1)
+  ) |> 
+  distinct()
+```
+
+## Test conditional logic from Stata
+
+```{r}
+
+ltpa_grouping_h1_h3 <- read_csv(
+  "//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_cleaned_full_data.csv"
+  )
+```
+
+```{r}
+
+ltpa_grouping_h1_h3 |> 
+  select(
+    exe_f_nt1blq2, exe_du_nt1blq2, exe_int_nt1blq2, ltpa_index_nt1, ltpa_group_nt1
+  ) |> 
+  filter(
+    is.na(ltpa_index_nt1) & is.na(ltpa_group_nt1)
+  ) |> 
+  distinct()
+```
+
+The data sets which are read in have been processed in Stata with the code provided by my supervisor.
+
+How many possible combinations is there of the three exercise columns? Notice that NA's are dropped.
+
+```{r}
+
+exe_f <- na.omit(unique(hunt_1_3_cleaned_full_data$exe_f_nt1blq2))
+exe_du <- na.omit(unique(hunt_1_3_cleaned_full_data$exe_du_nt1blq2))
+exe_int <- na.omit(unique(hunt_1_3_cleaned_full_data$exe_int_nt1blq2))
+
+expand.grid(
+  exe_f = exe_f,
+  exe_du = exe_du,
+  exe_int = exe_int
+) |> 
+  as_tibble()
+```
+
+### H1-H3
+
+#### Read .csv
+
+
+
+#### Check for all possible combinations who yields NA on both ltpa_index and ltpa_group
+
+Row 6, 8, 10 and 13 should be discussed with my supervisors.
+
+```{r}
+
+ltpa_grouping_h1_h3 |> 
+  select(
+    exe_f_nt1blq2, exe_du_nt1blq2, exe_int_nt1blq2, ltpa_index_nt1, ltpa_group_nt1
+  ) |> 
+  filter(
+    is.na(ltpa_index_nt1) & is.na(ltpa_group_nt1)
+  ) |> 
+  distinct(
+    exe_f_nt1blq2, exe_du_nt1blq2, exe_int_nt1blq2, ltpa_index_nt1, ltpa_group_nt1
+  )
+```
+
+Row 6 ~ 111:
+
+```{r}
+
+ltpa_grouping_h1_h3 |> 
+  select(
+    exe_f_nt1blq2, exe_du_nt1blq2, exe_int_nt1blq2, ltpa_index_nt1, ltpa_group_nt1
+  ) |>
+  filter(
+    exe_f_nt1blq2 == "En gang i uka" 
+    & exe_du_nt1blq2 == "30-60 minutter"
+    & exe_int_nt1blq2 == "Tar meg nesten helt ut"
+  )
+```
+
+Row 8 ~ 92:
+
+```{r}
+
+ltpa_grouping_h1_h3 |> 
+  select(
+    exe_f_nt1blq2, exe_du_nt1blq2, exe_int_nt1blq2, ltpa_index_nt1, ltpa_group_nt1
+  ) |>
+  filter(
+    exe_f_nt1blq2 == "En gang i uka" 
+    & exe_du_nt1blq2 == "Mer enn 60 minutter"
+    & exe_int_nt1blq2 == "Tar meg nesten helt ut"
+  )
+```
+
+Row 10 ~ 46:
+
+```{r}
+
+ltpa_grouping_h1_h3 |> 
+  select(
+    exe_f_nt1blq2, exe_du_nt1blq2, exe_int_nt1blq2, ltpa_index_nt1, ltpa_group_nt1
+  ) |>
+  filter(
+    exe_f_nt1blq2 == "Omtrent hver dag" 
+    & exe_du_nt1blq2 == "30-60 minutter"
+    & exe_int_nt1blq2 == "Tar meg nesten helt ut"
+  )
+```
+
+Row 13 ~ 4:
+
+```{r}
+
+ltpa_grouping_h1_h3 |> 
+  select(
+    exe_f_nt1blq2, exe_du_nt1blq2, exe_int_nt1blq2, ltpa_index_nt1, ltpa_group_nt1
+  ) |>
+  filter(
+    exe_f_nt1blq2 == "Omtrent hver dag" 
+    & exe_du_nt1blq2 == "15-29 minutter"
+    & exe_int_nt1blq2 == "Tar meg nesten helt ut"
+  )
+```
+
+### H1-H3-H4
+
+#### Read .csv
+
+```{r}
+
+ltpa_grouping_h1_h3_h4 <- read_csv(
+  "//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_cleaned_full_data.csv"
+  )
+```
+
+#### Check for all possible combinations who yields NA on both ltpa_index and ltpa_group
+
+## H3-H4
+
+```{r}
+
+
+```
+
+
