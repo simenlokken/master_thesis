@@ -35,7 +35,11 @@ library(forcats)
 
 ```{r}
 
-full_data <- read_parquet("//fil.nice.ntnu.no/nice/p758/Data master/full_data.parquet")
+# This is practical to have stored so I don't have to copy it from the NTNU NICE area all the time
+
+file_dir_NICE <- "//fil.nice.ntnu.no/nice/p758/data/my_data"
+
+full_data <- read_parquet("//fil.nice.ntnu.no/nice/p758/data/my_data/full_data.parquet")
 ```
 
 ## Process data
@@ -95,6 +99,13 @@ full_cleaned_data <- full_cleaned_data |>
 
 full_cleaned_data <- full_cleaned_data |> 
   mutate(age = year(end_date_death) - birth_year)
+
+# Write to NTNU NICE area
+
+write_parquet(
+  full_cleaned_data,
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/full_cleaned_data.parquet"
+)
 ```
 
 ### Distinguish different HUNT surveys into separate data frames
@@ -114,6 +125,11 @@ Q2 is the relevant Q for H1, it contains data on exercise, work, education, smok
 hunt_1_cleaned_full_data <- full_cleaned_data |> 
   select(contains(match = "nt1"), age, sex, end_date_death, death_all) |> 
   filter(!is.na(part_nt1blq2) & !is.na(part_nt1blm))
+
+write_parquet(
+  hunt_1_cleaned_full_data,
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_cleaned_full_data.parquet"
+)
 ```
 
 #### HUNT 2
@@ -125,6 +141,11 @@ Q1 is the relevant for Q for H2, it contains data on exercise, work, education, 
 hunt_2_cleaned_full_data <- full_cleaned_data |> 
   select(contains(match = "nt2"), age, sex, end_date_death, death_all) |> 
   filter(!is.na(part_nt2blq1) & !is.na(part_nt2blm))
+
+write_parquet(
+  hunt_2_cleaned_full_data,
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_2_cleaned_full_data.parquet"
+)
 ```
 
 #### HUNT 3
@@ -136,6 +157,11 @@ Q1 is the relevant for Q for H3, it contains data on exercise, work, education, 
 hunt_3_cleaned_full_data <- full_cleaned_data |> 
   select(contains(match = "nt3"), age, sex, end_date_death, death_all) |> 
   filter(!is.na(part_nt3blq1) & !is.na(part_nt3blm))
+
+write_parquet(
+  hunt_3_cleaned_full_data,
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_3_cleaned_full_data.parquet"
+)
 ```
 
 #### HUNT 4
@@ -147,6 +173,11 @@ Have no information on the surveys, so just did a filtering on baseline measurem
 hunt_4_cleaned_full_data <- full_cleaned_data |>
   select(contains(match = "nt4"), age, sex, end_date_death, death_all) |> 
   filter(!is.na(part_nt4blm))
+
+write_parquet(
+  hunt_4_cleaned_full_data,
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_4_cleaned_full_data.parquet"
+)
 ```
 
 #### Data frames for change in LTPA
@@ -189,7 +220,7 @@ Write to disk for further Stata manipulation:
 # )
 ```
 
-The process is repeated for H1-H3-H4 and H3-H4 as well.
+The process is repeated for H1-H3-H4 and H3-H4 as well. **Note: These .csv files must not be written to disk in this script because they will overwrite the ones processed in Stata.**
 
 #### HUNT 1-3-4
 
