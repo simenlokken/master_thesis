@@ -8,103 +8,13 @@ editor_options:
 
 ## Information
 
-This script contains functions that have been used throughout the analyses for the thesis. There is no other documentation available than the respective function.
+This script contains functions that have been used throughout the analyses for the thesis. There is no other documentation available.
 
 ## Data processing functions
 
 ### No change in LTPA
 
 #### HUNT 1
-
-##### LTPA index variable
-
-```{r}
-
-process_hunt_1_no_change_ltpa_index <- function(
-    dataframe,
-    exe_du,
-    exe_f,
-    exe_int,
-    part_dat,
-    bp,
-    bmi,
-    smo_stat,
-    alc,
-    edu_level
-    ) {
-  dataframe |> 
-      rename(
-      exercise_duration = exe_du_nt1blq2, 
-      exercise_frequency_per_week = exe_f_nt1blq2,
-      exercise_intensity = exe_int_nt1blq2,
-      death_all_cause = death_all,
-      participation_date = part_dat_nt1blq1,
-      bp_systolic = bp_syst2_nt1blm,
-      bmi = bmi_nt1blm,
-      smo_status = smo_stat_nt1blq2,
-      alcohol_usage = alc_fl2w_nt1blq2,
-      education_level = educ_nt1blq2
-    ) |> 
-       mutate(
-      int_index = case_when(
-        exe_int_nt1blq2 == "Tar det rolig uten å bli andpusten eller svett" ~ 1,
-        exe_int_nt1blq2 == "Tar det så hardt at jeg blir andpusten og svett" ~ 2,
-        exe_int_nt1blq2 == "Tar meg nesten helt ut " ~ 3,
-        TRUE ~ 0
-      ),
-      dur_index = case_when(
-        exe_du_nt1blq2 == "Mindre enn 15 minutter" ~ 0.10,
-        exe_du_nt1blq2 == "16-30 minutter" ~ 0.38,
-        exe_du_nt1blq2 == "30 minutter-1 time" ~ 0.75,
-        exe_du_nt1blq2 == "Mindre enn 15 minutter" ~ 1.0,
-        TRUE ~ 0
-      ),
-      freq_index = case_when(
-        exe_f_nt1blq2 == "Aldri" ~ 0,
-        exe_f_nt1blq2 == "Sjeldnere enn en gang i uka" ~ 0.5,
-        exe_f_nt1blq2 == "En gang i uka" ~ 1,
-        exe_f_nt1blq2 == "2-3 ganger i uka" ~ 2.5,
-        exe_f_nt1blq2 == "Omtrent hver dag" ~ 5,
-        TRUE ~ 0
-      ),
-      ltpa_index = int_index * dur_index * freq_index,
-      follow_up_time_in_years = as.period(interval(part_dat_nt1blq1, end_date_death)) / years(1),
-      death_all_cause = as.numeric(death_all_cause) # Surv() input needs to be numeric
-       ) |> 
-  select(
-    age,
-    sex,
-    part_dat,
-    end_date_death,
-    follow_up_time_in_years,
-    exe_du
-    ltpa_index,
-    
-    exe_du,
-    exe_f,
-    exe_int,
-    part_dat,
-    bp,
-    bmi,
-    smo_stat,
-    alc,
-    edu_level
-    
-      age,
-      sex,
-      ,
-      end_date_death,
-      follow_up_time_in_years,
-      death_all_cause,
-      ltpa_index,
-      bp_systolic,
-      bmi,
-      alcohol_usage,
-      smo_status,
-      education_level
-  )
-}
-```
 
 ##### Quasi-continous PA variable (min/week)
 
@@ -167,7 +77,7 @@ process_hunt_1_no_change_cont_var <- function(dataframe) {
 
 #### HUNT 2
 
-##### Quasi-continous PA variable
+##### Quasi-continous PA variable (min/week)
 
 ```{r}
 
@@ -226,73 +136,7 @@ process_hunt_2_no_change_cont_var <- function(dataframe) {
 
 #### HUNT 3
 
-##### LTPA index variable
-
-```{r}
-
-process_hunt_3_no_change_ltpa_index <- function(dataframe) {
-  dataframe |> 
-    rename(
-      exercise_duration = exe_du_nt3blq1,
-      exercise_frequency_per_week = exe_f_nt3blq1,
-      exercise_intensity = exe_int_nt3blq1,
-      participation_date = part_dat_nt3blq1,
-      death_all_cause = death_all,
-      bp_systolic = bp_syst_mn23_nt3blm,
-      bmi = bmi_nt3blm,
-      smo_status = smo_stat_nt3blq1,
-      alcohol_usage = alc_tot_unit_w_nt3blq1
-    ) |> 
-    mutate(
-      participation_date = case_when(
-        is.na(participation_date) ~ as_date("2006-10-15"),
-        TRUE ~ participation_date
-      ),
-      int_index = case_when(
-        exercise_intensity == "Tar det rolig uten å bli andpusten eller svett" ~ 1,
-        exercise_intensity == "Tar det så hardt at jeg blir andpusten og svett" ~ 2,
-        exercise_intensity == "Tar meg nesten helt ut" ~ 3,
-        TRUE ~ 0
-      ),
-      dur_index = case_when(
-        exercise_duration == "Mindre enn 15 minutter" ~ 0.10,
-        exercise_duration == "15-29 minutter" ~ 0.38,
-        exercise_duration == "30 minutter - 1 time" ~ 0.75,
-        exercise_duration == "Mer enn 1 time" ~ 1.0,
-        TRUE ~ 0
-      ),
-      freq_index = case_when(
-        exercise_frequency_per_week == "Aldri" ~ 0,
-        exercise_frequency_per_week == "Sjeldnere enn en gang i uka" ~ 0.5,
-        exercise_frequency_per_week == "En gang i uka" ~ 1,
-        exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5,
-        exercise_frequency_per_week == "Omtrent hver dag" ~ 5,
-        TRUE ~ 0
-      ),
-      ltpa_index = int_index * dur_index * freq_index,
-      follow_up_time_in_years = as.period(interval(participation_date, end_date_death)) / years(1),
-      death_all_cause = as.numeric(death_all_cause)
-    ) |> 
-    select(
-      age,
-      sex,
-      participation_date,
-      end_date_death,
-      follow_up_time_in_years,
-      death_all_cause,
-      exercise_intensity,
-      exercise_frequency_per_week,
-      exercise_duration,
-      ltpa_index,
-      bp_systolic,
-      bmi,
-      alcohol_usage,
-      smo_status
-    )
-}
-```
-
-##### Quasi-continuous PA variable
+##### Quasi-continuous PA variable (min/week)
 
 ```{r}
 
@@ -352,75 +196,7 @@ process_hunt_3_no_change_cont_var <- function(dataframe) {
 
 #### HUNT 4
 
-##### LTPA index variable
-
-```{r}
-
-process_hunt_4_no_change_ltpa_index <- function(dataframe) {
-  dataframe |> 
-    rename(
-      exercise_duration = exe_du_nt4blq1,
-      exercise_frequency_per_week = exe_f_nt4blq1,
-      exercise_intensity = exe_int_nt4blq1,
-      death_all_cause = death_all,
-      participation_date = part_dat_nt4blq1,
-      bp_systolic = bp_syst_mn23_nt4blm,
-      bmi = bmi_nt4blm,
-      smo_status = smo_stat_nt4blq1,
-      alcohol_usage = alc_tot_unit_w_nt4blq1,
-      educational_level = educ_nt4blq1
-    ) |>
-    mutate(
-      int_index = case_when(
-        exercise_intensity == "Tar det rolig uten å bli andpusten eller svett" ~ 1,
-        exercise_intensity == "Tar det så hardt at jeg blir andpusten eller svett" ~ 2,
-        exercise_intensity == "Tar meg nesten helt ut" ~ 3,
-        TRUE ~ 0
-      ),
-      dur_index = case_when(
-        exercise_duration == "Mindre enn 15 minutter" ~ 0.10,
-        exercise_duration == "15-29 minutter" ~ 0.38,
-        exercise_duration == "30-60 minutter" ~ 0.75,
-        exercise_duration == "Mer enn 60 minutter" ~ 1.0,
-        TRUE ~ 0
-      ),
-      freq_index = case_when(
-        exercise_frequency_per_week == "Aldri" ~ 0,
-        exercise_frequency_per_week == "Sjeldnere enn en gang i uka" ~ 0.5,
-        exercise_frequency_per_week == "En gang i uka" ~ 1,
-        exercise_frequency_per_week == "2-3 ganger i uka" ~ 2.5,
-        exercise_frequency_per_week == "Omtrent hver dag" ~ 5,
-        TRUE ~ 0
-      ),
-      ltpa_index = int_index * dur_index * freq_index,
-      participation_date = case_when(
-        is.na(participation_date) ~ as_date("2017-05-15"),
-        TRUE ~ participation_date
-      ),
-      follow_up_time_in_years = as.period(interval(participation_date, end_date_death)) / years(1),
-      death_all_cause = as.numeric(death_all_cause)
-    ) |> 
-    select(
-      age,
-      sex,
-      participation_date,
-      end_date_death,
-      follow_up_time_in_years,
-      death_all_cause,
-      exercise_intensity,
-      exercise_frequency_per_week,
-      exercise_duration,
-      ltpa_index,
-      bp_systolic,
-      bmi,
-      alcohol_usage,
-      smo_status,
-      educational_level
-    )
-}
-```
-
-#### Quasi-continous PA variable
+#### Quasi-continous PA variable (min/week)
 
 ```{r}
 
@@ -479,11 +255,13 @@ process_hunt_4_no_change_cont_var <- function(dataframe) {
 
 ### Change in LTPA
 
-For change in LTPA, there are no specific functions. The data processing were done in Stata, code is available on the same GitHub repo.
+For change in LTPA, there are no specific functions. The data processing are done in R and Stata, and is found in the data_preparation.qmd script.
 
 ## Regression modelling functions
 
 ### Cox regression
+
+General Cox regression function:
 
 ```{r}
 
@@ -510,6 +288,8 @@ run_cox_reg <- function(data, strata = NULL, time, status, covariates) {
 
 #### Crude Cox regression
 
+Specialized function for crude Cox regression:
+
 ```{r}
 
 run_cox_reg_crude <- function(dataframe, strata, pa_var) {
@@ -532,6 +312,8 @@ run_cox_reg_crude <- function(dataframe, strata, pa_var) {
 ```
 
 #### Multi-adjusted Cox regression
+
+Specialized function for multi-adjusted Cox regression:
 
 ```{r}
 
