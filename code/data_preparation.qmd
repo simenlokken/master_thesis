@@ -8,7 +8,7 @@ editor_options:
 
 ## Information
 
-This script is a general preparation for the data. It retrieves the data and does some basic processing. In addition, it distinguished the data from the different surveys and saves them in separate data frames.
+This script is a general preparation for the data. It retrieves the data and does some basic processing. In addition, it distinguished the data from the different surveys and distinguish them in separate data frames.
 
 ## Set environment and load packages
 
@@ -35,10 +35,7 @@ library(forcats)
 
 ```{r}
 
-# full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/Data master/full_data.csv")
-
 full_data <- read_parquet("//fil.nice.ntnu.no/nice/p758/Data master/full_data.parquet")
-
 ```
 
 ## Process data
@@ -58,7 +55,7 @@ full_cleaned_data <- full_data |>
 
 rm(full_data)
 
-# Change from chr to fct
+# Change from characterto factors
 
 full_cleaned_data <- full_cleaned_data |>
   mutate_if(is.character, as.factor)
@@ -154,11 +151,11 @@ hunt_4_cleaned_full_data <- full_cleaned_data |>
 
 #### Data frames for change in LTPA
 
-
+The data processing for these data frames is done in both Stata and in R. The basic processing of distinguishing into different data frames and string manipulation is done in R, while dividing participants into LTPA trajectory groups are done in Stata and in R. Ultimately, this means that the data is written to a .csv here before Stata processing, and read in as a .csv after its been processed in Stata.
 
 #### HUNT 1-3
 
-We have to do some string manipulation for H1 and H3 due to different phrasing compared to H4.
+Distinguish into a data frame and string manipulation:
 
 ```{r}
 
@@ -180,12 +177,19 @@ hunt_1_3_cleaned_full_data <- full_cleaned_data |>
       .default = exe_du_nt3blq1
     )
    )
+```
+
+Write to disk for further Stata manipulation:
+
+```{r}
 
 # write_csv(
 #   hunt_1_3_cleaned_full_data,
 #   "//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_cleaned_full_data.csv"
 # )
 ```
+
+The process is repeated for H1-H3-H4 and H3-H4 as well.
 
 #### HUNT 1-3-4
 
@@ -211,6 +215,9 @@ hunt_1_3_4_cleaned_full_data <- full_cleaned_data |>
       .default = exe_du_nt3blq1
     )
    )
+```
+
+```{r}
 
 # write_csv(
 #   hunt_1_3_4_cleaned_full_data,
@@ -234,6 +241,9 @@ hunt_3_4_cleaned_full_data <- full_cleaned_data |>
       .default = exe_du_nt3blq1
     )
    )
+```
+
+```{r}
 
 # write_csv(
 #   hunt_3_4_cleaned_full_data,
