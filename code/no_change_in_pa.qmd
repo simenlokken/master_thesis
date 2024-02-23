@@ -1,0 +1,540 @@
+---
+title: "No change in PA"
+author: "Simen Løkken"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+## Information
+
+This script contains the analyses for HUNT 1-4 without considering change in LTPA.
+
+## Set environment and load packages
+
+```{r setup}
+
+knitr::opts_chunk$set(
+  warning = FALSE,
+  message = FALSE
+)
+```
+
+```{r}
+
+library(dplyr)
+library(tibble)
+library(lubridate)
+library(readr)
+library(tidyr)
+library(arrow)
+library(forcats)
+library(purrr)
+library(survival)
+```
+
+## Association between LTPA and risk of all-cause mortality
+
+In order to perform the analyses, we must filter out participants from each survey. This is done in data_preparation.qmd.
+
+Then, we must a data processing function to each data set, these functions lie in functions.qmd.
+
+**Note that we re-use the vectors containing the crude and multi-adjusted covariates throughout all the models.**
+
+### H1
+
+#### No stratification
+
+##### Process data
+
+Read in data:
+
+```{r}
+
+hunt_1_cleaned_full_data <- read_parquet(
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_cleaned_full_data.parquet"
+)
+```
+
+Apply data processing function:
+
+```{r}
+
+hunt_1_cleaned_full_data <- hunt_1_cleaned_full_data |> 
+  process_hunt_1_no_change()
+```
+
+##### Crude Cox Regression
+
+```{r}
+
+crude_covariates <- c("sex", "age", "pa_min_per_week")
+
+run_cox_reg(
+  data = hunt_1_cleaned_full_data,
+  time = follow_up_time_in_years,
+  status = death_all_cause,
+  covariates = crude_covariates
+)
+```
+
+##### Multi-adjusted Cox regression
+
+```{r}
+
+multi_adj_covariates <- c(
+  "pa_min_per_week",
+  "bp_systolic",
+  "bmi",
+  "smo_status",
+  "age",
+  "sex",
+  "alcohol_usage"
+)
+
+run_cox_reg(
+  data = hunt_1_cleaned_full_data,
+  time = follow_up_time_in_years,
+  status = death_all_cause,
+  covariates = multi_adj_covariates
+)
+```
+
+##### Regression results and statistics
+
+```{r}
+
+```
+
+#### Stratified by socioeconomic status
+
+Add a socioeconomic variable to the data:
+
+```{r}
+
+hunt_1_cleaned_full_data_socio_strat <-  hunt_1_cleaned_full_data |> 
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+      education_level %in% c(
+        "7-årig folkeskole eller kortere", 
+        "9-årig grunnskole", 
+        "Real- eller middelskole, grunnskolen 10.år", 
+        "Framhalds- eller fortsettelsesskole") ~ "low",
+      education_level %in% c(
+        "Ett- eller toårig videregående skole", 
+        "Artium, økonomisk gymnas eller almenfaglig retning i vgs.") ~ "medium",
+      education_level %in% c(
+        "Høyskole eller universitet, 4 år eller mer", 
+        "Høyskole eller universitet, mindre enn 4 år") ~ "high")
+    )
+  )
+```
+
+##### Crude Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_1_cleaned_full_data_socio_strat,
+  time = follow_up_time_in_years,
+  strata = socioeconomic_class,
+  status = death_all_cause,
+  covariates = crude_covariates
+)
+```
+
+##### Multi-adjusted Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_1_cleaned_full_data_socio_strat,
+  time = follow_up_time_in_years,
+  strata = socioeconomic_class,
+  status = death_all_cause,
+  covariates = multi_adj_covariates
+)
+```
+
+##### Regression results and statistics
+
+### H2
+
+#### No stratification
+
+##### Process data
+
+Read in data:
+
+```{r}
+
+hunt_2_cleaned_full_data <- read_parquet(
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_2_cleaned_full_data.parquet"
+)
+```
+
+Apply data processing function:
+
+```{r}
+
+hunt_2_cleaned_full_data <- hunt_2_cleaned_full_data |> 
+  process_hunt_2_no_change()
+```
+
+##### Crude Cox Regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_2_cleaned_full_data,
+  time = follow_up_time_in_years,
+  status = death_all_cause,
+  covariates = crude_covariates
+)
+```
+
+##### Multi-adjusted Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_2_cleaned_full_data,
+  time = follow_up_time_in_years,
+  status = death_all_cause,
+  covariates = multi_adj_covariates
+)
+```
+
+##### Regression results and statistics
+
+```{r}
+
+```
+
+#### Stratified by socioeconomic status
+
+Add a socioeconomic variable to the data:
+
+```{r}
+
+hunt_2_cleaned_full_data_socio_strat <-  hunt_2_cleaned_full_data |> 
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+      education_level %in% c(
+        "Grunnskole 7-10 år, framhaldsskole, folkehøgskole"
+        ) ~ "low",
+      education_level %in% c(
+        "Artium, øk.gymnas, allmennfaglig retning i videregående skole", 
+        "Realskole, middelskole, yrkesskole 1-2 årig videregående skole"
+        ) ~ "medium",
+    education_level %in% c(
+      "Høgskole/universitet, 4 år eller mer", 
+      "Høgskole/universitet, mindre enn 4 år"
+      ) ~ "high"))
+  )
+```
+
+##### Crude Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_2_cleaned_full_data_socio_strat,
+  time = follow_up_time_in_years,
+  strata = socioeconomic_class,
+  status = death_all_cause,
+  covariates = crude_covariates
+)
+```
+
+##### Multi-adjusted Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_2_cleaned_full_data_socio_strat,
+  time = follow_up_time_in_years,
+  strata = socioeconomic_class,
+  status = death_all_cause,
+  covariates = multi_adj_covariates
+)
+```
+
+##### Regression results and statistics
+
+### H3
+
+#### No stratification
+
+##### Process data
+
+Read in data:
+
+```{r}
+
+hunt_3_cleaned_full_data <- read_parquet(
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_3_cleaned_full_data.parquet"
+)
+```
+
+Apply data processing function:
+
+```{r}
+
+hunt_3_cleaned_full_data <- hunt_3_cleaned_full_data |> 
+  process_hunt_3_no_change()
+```
+
+##### Crude Cox Regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_3_cleaned_full_data,
+  time = follow_up_time_in_years,
+  status = death_all_cause,
+  covariates = crude_covariates
+)
+```
+
+##### Multi-adjusted Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_3_cleaned_full_data,
+  time = follow_up_time_in_years,
+  status = death_all_cause,
+  covariates = multi_adj_covariates
+)
+```
+
+##### Regression results and statistics
+
+```{r}
+
+```
+
+#### Stratified by socioeconomic status
+
+Add a socioeconomic variable to the data:
+
+```{r}
+
+hunt_3_cleaned_full_data_socio_strat <-  hunt_3_cleaned_full_data |> 
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+      occupational_type %in% c(
+        "Yrker uten krav til utdanning",
+        "Yrker innen jordbruk, skogbruk og fiske",
+        "Prosess- og maskinoperatører, transportarbeidere mv."
+        ) ~ "low",
+      occupational_type %in% c(
+        "Kontor- og kundeserviceyrker",
+        "Salgs-, service- og omsorgsyrker", 
+        "Håndverkere o.l.", "Militære yrker og uoppgitt"
+        ) ~ "medium",
+      occupational_type %in% c(
+        "Administrative ledere og politikere", 
+        "Akademiske yrker", 
+        "Yrker med kortere høyskole- og universitetsutdanning og teknikere"
+        ) ~ "high")
+    )
+  )
+```
+
+##### Crude Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_3_cleaned_full_data_socio_strat,
+  time = follow_up_time_in_years,
+  strata = socioeconomic_class,
+  status = death_all_cause,
+  covariates = crude_covariates
+)
+```
+
+##### Multi-adjusted Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_3_cleaned_full_data_socio_strat,
+  time = follow_up_time_in_years,
+  strata = socioeconomic_class,
+  status = death_all_cause,
+  covariates = multi_adj_covariates
+)
+```
+
+##### Regression results and statistics
+
+### H4
+
+#### No stratification
+
+##### Process data
+
+Read in data:
+
+```{r}
+
+hunt_4_cleaned_full_data <- read_parquet(
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_4_cleaned_full_data.parquet"
+)
+```
+
+Apply data processing function:
+
+```{r}
+
+hunt_4_cleaned_full_data <- hunt_4_cleaned_full_data |> 
+  process_hunt_4_no_change()
+```
+
+##### Crude Cox Regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_4_cleaned_full_data,
+  time = follow_up_time_in_years,
+  status = death_all_cause,
+  covariates = crude_covariates
+)
+```
+
+##### Multi-adjusted Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_4_cleaned_full_data,
+  time = follow_up_time_in_years,
+  status = death_all_cause,
+  covariates = multi_adj_covariates
+)
+```
+
+##### Regression results and statistics
+
+```{r}
+
+```
+
+#### Stratified by socioeconomic status
+
+Add a socioeconomic variable to the data:
+
+```{r}
+
+hunt_4_cleaned_full_data_socio_strat <-  hunt_4_cleaned_full_data |> 
+  mutate(
+    socioeconomic_class = as.factor(case_when(
+      education_level %in% c(
+        "Grunnskole", "Fagbrev eller svennebrev"
+        ) ~ "low",
+      education_level %in% c(
+        "3 år i videregående skole", 
+        "1-2årig videregående skole"
+        ) ~ "medium",
+      education_level %in% c(
+        "Høyskole/universitet, 4 år eller mer", 
+        "Høyskole/universitet, mindre enn 4 år"
+        ) ~ "high")
+    )
+  )
+```
+
+##### Crude Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_4_cleaned_full_data_socio_strat,
+  time = follow_up_time_in_years,
+  strata = socioeconomic_class,
+  status = death_all_cause,
+  covariates = crude_covariates
+)
+```
+
+##### Multi-adjusted Cox regression
+
+```{r}
+
+run_cox_reg(
+  data = hunt_4_cleaned_full_data_socio_strat,
+  time = follow_up_time_in_years,
+  strata = socioeconomic_class,
+  status = death_all_cause,
+  covariates = multi_adj_covariates
+)
+```
+
+##### Regression results and statistics
+
+#### Copyied from old script
+
+This is just copied in, has not been positioned yet:
+
+# SUMMARY STATS FROM MODELS
+
+# Multi-adjusted model
+
+```{r}
+
+socioeconomic_class <- c("low", "medium", "high")
+
+for (class in socioeconomic_class) {
+    calculate_num_of_participants_strat(
+      dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"), 
+      covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                     "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "socioeconomic_class"),
+      strata = class
+    )
+}
+
+socioeconomic_class <- c("low", "medium", "high")
+
+for (class in socioeconomic_class) {
+    calculate_num_of_participants_strat(
+      dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"), 
+      covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                     "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "socioeconomic_class"),
+      strata = class
+    )
+}
+
+for (class in socioeconomic_class) {
+  calculate_person_years_follow_up_strat(
+    dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"),
+    covariates = c("age", "pa_hrs_per_week", "follow_up_time_in_years", "death_all_cause", "bp_diastolic", "bp_systolic",
+                   "bmi", "packs_of_smoke_per_year", "sex", "alcohol_usage", "heart_infarction", "socioeconomic_class"),
+    strata = class
+  )
+}
+
+# Crude model
+
+for (class in socioeconomic_class) {
+  calculate_num_of_participants_strat(
+    dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"), 
+    covariates = c("pa_hrs_per_week", "age", "follow_up_time_in_years", "death_all_cause", "socioeconomic_class"),
+    strata = class
+  )
+}
+
+for (class in socioeconomic_class) {
+  calculate_person_years_follow_up_strat(
+    dataframes = c("hunt_1_cleaned_data_socio_strat", "hunt_2_cleaned_data_socio_strat", "hunt_3_cleaned_data_socio_strat", "hunt_4_cleaned_data_socio_strat"),
+    covariates = c("pa_hrs_per_week", "age", "follow_up_time_in_years", "death_all_cause", "socioeconomic_class"),
+    strata = class
+  )
+}
+
+```
+

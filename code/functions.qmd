@@ -20,7 +20,7 @@ This script contains functions that have been used throughout the analyses for t
 
 ```{r}
 
-process_hunt_1_no_change_cont_var <- function(dataframe) {
+process_hunt_1_no_change <- function(dataframe) {
   dataframe |> 
     rename(
       exercise_duration = exe_du_nt1blq2, 
@@ -81,7 +81,7 @@ process_hunt_1_no_change_cont_var <- function(dataframe) {
 
 ```{r}
 
-process_hunt_2_no_change_cont_var <- function(dataframe) {
+process_hunt_2_no_change <- function(dataframe) {
   dataframe |> 
     rename(
       exercise_time_per_week_high_int = exe_har_du_ly_nt2blq1,
@@ -140,7 +140,7 @@ process_hunt_2_no_change_cont_var <- function(dataframe) {
 
 ```{r}
 
-process_hunt_3_no_change_cont_var <- function(dataframe) {
+process_hunt_3_no_change <- function(dataframe) {
   dataframe |> 
     rename(
       exercise_duration = exe_du_nt3blq1,
@@ -200,7 +200,7 @@ process_hunt_3_no_change_cont_var <- function(dataframe) {
 
 ```{r}
 
-process_hunt_4_no_change_cont_var <- function(dataframe) {
+process_hunt_4_no_change <- function(dataframe) {
   dataframe |>
     rename(
       exercise_duration = exe_du_nt4blq1,
@@ -211,7 +211,7 @@ process_hunt_4_no_change_cont_var <- function(dataframe) {
       bmi = bmi_nt4blm,
       smo_status = smo_stat_nt4blq1,
       alcohol_usage = alc_tot_unit_w_nt4blq1,
-      educational_level = educ_nt4blq1
+      education_level = educ_nt4blq1
     ) |>
     mutate(
       minutes_duration_each_exercise_bout = case_when(
@@ -248,7 +248,8 @@ process_hunt_4_no_change_cont_var <- function(dataframe) {
       bp_systolic,
       bmi,
       alcohol_usage,
-      smo_status
+      smo_status,
+      education_level
     )
 }
 ```
@@ -261,7 +262,7 @@ For change in LTPA, there are no specific functions. The data processing are don
 
 ### Cox regression
 
-General Cox regression function:
+Cox regression function:
 
 ```{r}
 
@@ -283,59 +284,6 @@ run_cox_reg <- function(data, strata = NULL, time, status, covariates) {
     unnest(test_results) |> 
     select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
     ungroup()
-}
-```
-
-#### Crude Cox regression
-
-Specialized function for crude Cox regression:
-
-```{r}
-
-run_cox_reg_crude <- function(dataframe, strata, pa_var) {
-  
-  result <- dataframe |> 
-    group_by({{ strata }}) |> 
-    drop_na({{ strata }} ) |> 
-    nest() |> 
-    mutate(test_results = map(
-      .x = data, 
-      .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ !!sym(pa_var) + age, data =.x) |> 
-        broom::tidy(conf.int = TRUE, exponentiate = TRUE))
-    ) |> 
-    unnest(test_results) |>  
-    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
-    ungroup()
-  
-  return(result)
-}
-```
-
-#### Multi-adjusted Cox regression
-
-Specialized function for multi-adjusted Cox regression:
-
-```{r}
-
-
-run_cox_reg_multi <- function(dataframe, strata, pa_var) {
-  
-  result <- dataframe |> 
-    group_by({{ strata }}) |> 
-    drop_na({{ strata }}) |> 
-    nest() |> 
-    mutate(test_results = map(.x = data, 
-                              .f = ~ coxph(Surv(follow_up_time_in_years, death_all_cause) ~ !!sym(pa_var) + 
-                                             bp_systolic + bmi + smo_status + age + alcohol_usage + sex, 
-                                           data =.x) |> 
-                                broom::tidy(conf.int = TRUE, exponentiate = TRUE))
-           
-    ) |> 
-    unnest(test_results) |> 
-    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
-    ungroup()
-  
-  return(result)
 }
 ```
 

@@ -1,6 +1,5 @@
 ---
-title: "Physical Activity Index"
-subtitle: "HUNT 1-4, change in PA"
+title: "Change in PA"
 format: html
 editor: visual
 editor_options: 
@@ -26,18 +25,14 @@ knitr::opts_chunk$set(
 ```{r}
 
 library(dplyr)
-library(tidyr)
 library(tibble)
 library(lubridate)
 library(readr)
 library(forcats)
 library(survival)
-library(patchwork)
 ```
 
 ## Longitudinal trends across H1-H3-H4
-
-### Process data
 
 In order to perform the analyses, we must filter out participants as follows:
 
@@ -47,20 +42,22 @@ In order to perform the analyses, we must filter out participants as follows:
 
 These operations are in **data_preparation.qmd**
 
-Then, we must used their exercise data to create LTPA groups. 
+Then, we must used their exercise data to create LTPA groups.
 
-The process of differentiating participants into LTPA groups are done in Stata. Code can be located in the same GitHub repository as the rest of the code. Therefore, we will only load in a .csv file that's been processed in Stata and do the analyses on those.
+The process of differentiating participants into LTPA groups are done in Stata. Code can be located in the same GitHub repository as the rest of the code. Therefore, we will only load in a .csv file that's been processed in Stata and do the analyses on those. However, we will create a LTPA trajectory variable as preliminary for the analyses here in R.
 
-#### H1-H3
+### H1-H3
+
+#### Process data
 
 Load data that's been processed in Stata:
 
 ```{r}
 
-hunt_1_3_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_cleaned_full_data.csv")
+hunt_1_3_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_3_cleaned_full_data.csv")
 ```
 
-Process data that's been lost in the Stata process:
+Process data that's been lost in the Stata process, i.e., make them factor variable types:
 
 ```{r}
 
@@ -71,17 +68,36 @@ hunt_1_3_cleaned_full_data <- hunt_1_3_cleaned_full_data |>
     ltpa_index_nt1 = as_factor(ltpa_index_nt1),
     ltpa_group_nt1 = as_factor(ltpa_group_nt1),
     ltpa_index_nt3 = as_factor(ltpa_index_nt3),
-    ltpa_group_nt3 = as_factor(ltpa_group_nt3)
+    ltpa_group_nt3 = as_factor(ltpa_group_nt3),
+    trajectory_group = as_factor(case_when(
+      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Low" ~ "Low, low",
+      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Moderate/high" ~ "Low, high",
+      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Low" ~ "High, low",
+      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Moderate/high" ~ "High, high")
+    )
   )
 ```
 
-#### H1-H3-H4
+#### Analyses
+
+Crude:
+
+```{r}
+
+
+```
+
+Multi-adjusted:
+
+### H1-H3-H4
+
+#### Process data
 
 Load data that's been processed in Stata:
 
 ```{r}
 
-hunt_1_3_4_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_4_cleaned_full_data.csv")
+hunt_1_3_4_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_3_4_cleaned_full_data.csv")
 ```
 
 Process data that's been lost in the Stata process:
@@ -97,15 +113,31 @@ hunt_1_3_4_cleaned_full_data <- hunt_1_3_4_cleaned_full_data |>
     ltpa_index_nt3 = as_factor(ltpa_index_nt3),
     ltpa_group_nt3 = as_factor(ltpa_group_nt3),
     ltpa_index_nt4 = as_factor(ltpa_index_nt4),
-    ltpa_group_nt4 = as_factor(ltpa_group_nt4)
+    ltpa_group_nt4 = as_factor(ltpa_group_nt4),
+    trajectory_group = as_factor(case_when(
+      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Low" ~ "Low, low, low",
+      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Moderate/high" ~ "Low, low, high",
+      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Moderate/high" ~ "Low, high, high",
+      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Moderate/high" ~ "High, high, high",
+      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Low" ~ "High, high, low",
+      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Low" ~ "High, low, low")
+    )
   )
 ```
 
-#### H3-H4
+#### Analyses
+
+Crude:
+
+Multi-adjusted:
+
+### H3-H4
+
+#### Process data
 
 ```{r}
 
-hunt_3_4_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/Data master/hunt_3_4_cleaned_full_data.csv")
+hunt_3_4_cleaned_full_data <-  read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_3_4_cleaned_full_data.csv")
 ```
 
 Process data that's been lost in the Stata process:
@@ -119,8 +151,21 @@ hunt_3_4_cleaned_full_data <- hunt_3_4_cleaned_full_data |>
     ltpa_index_nt3 = as_factor(ltpa_index_nt3),
     ltpa_group_nt3 = as_factor(ltpa_group_nt3),
     ltpa_index_nt4 = as_factor(ltpa_index_nt4),
-    ltpa_group_nt4 = as_factor(ltpa_group_nt4)
+    ltpa_group_nt4 = as_factor(ltpa_group_nt4),
+    trajectory_group = as_factor(case_when(
+      ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Low" ~ "Low, low",
+      ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Moderate/high" ~ "Low, high",
+      ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Low" ~ "High, low",
+      ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Moderate/high" ~ "High, high")
+    )
   )
 
 ```
+
+#### Analyses
+
+Crude:
+
+
+Multi-adjusted:
 

@@ -59,7 +59,7 @@ full_cleaned_data <- full_data |>
 
 rm(full_data)
 
-# Change from characterto factors
+# Change from characters to factors
 
 full_cleaned_data <- full_cleaned_data |>
   mutate_if(is.character, as.factor)
@@ -216,7 +216,7 @@ Write to disk for further Stata manipulation:
 
 # write_csv(
 #   hunt_1_3_cleaned_full_data,
-#   "//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_cleaned_full_data.csv"
+#   "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_3_cleaned_full_data.csv"
 # )
 ```
 
@@ -252,7 +252,7 @@ hunt_1_3_4_cleaned_full_data <- full_cleaned_data |>
 
 # write_csv(
 #   hunt_1_3_4_cleaned_full_data,
-#   "//fil.nice.ntnu.no/nice/p758/Data master/hunt_1_3_4_cleaned_full_data.csv"
+#   "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_3_4_cleaned_full_data.csv"
 # )
 ```
 
@@ -278,6 +278,6 @@ hunt_3_4_cleaned_full_data <- full_cleaned_data |>
 
 # write_csv(
 #   hunt_3_4_cleaned_full_data,
-#   "//fil.nice.ntnu.no/nice/p758/Data master/hunt_3_4_cleaned_full_data.csv"
+#   "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_3_4_cleaned_full_data.csv"
 # )
 ```
