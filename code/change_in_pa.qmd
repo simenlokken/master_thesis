@@ -54,40 +54,61 @@ Load data that's been processed in Stata:
 
 ```{r}
 
-hunt_1_3_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_3_cleaned_full_data.csv")
+hunt_1_3 <- read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_3.csv")
 ```
 
-Process data that's been lost in the Stata process, i.e., make them factor variable types:
+Process data that's been lost in the Stata process, i.e., create factor variable types and set reference value in the trajectory group. 
 
 ```{r}
 
-glimpse(hunt_1_3_cleaned_full_data)
+glimpse(hunt_1_3)
 
-hunt_1_3_cleaned_full_data <- hunt_1_3_cleaned_full_data |> 
+hunt_1_3 <- hunt_1_3 |> 
+  process_hunt_1_3() |> 
   mutate(
-    ltpa_index_nt1 = as_factor(ltpa_index_nt1),
-    ltpa_group_nt1 = as_factor(ltpa_group_nt1),
-    ltpa_index_nt3 = as_factor(ltpa_index_nt3),
-    ltpa_group_nt3 = as_factor(ltpa_group_nt3),
-    trajectory_group = as_factor(case_when(
-      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Low" ~ "Low, low",
-      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Moderate/high" ~ "Low, high",
-      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Low" ~ "High, low",
-      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Moderate/high" ~ "High, high")
-    )
+    death_all = as_factor(death_all)
   )
 ```
 
 #### Analyses
 
+The covariates are the same for all surveys because we have used data at baseline.
+
 Crude:
 
 ```{r}
 
+crude_covariates <- c("age", "sex", "trajectory_group")
 
+run_cox_reg(
+  hunt_1_3,
+  time = follow_up_time,
+  status = death_all,
+  covariates = crude_covariates
+)
 ```
 
 Multi-adjusted:
+
+```{r}
+
+multi_adj_covariates_h1_h3_h4 <- c(
+  "age", 
+  "sex", 
+  "trajectory_group",
+  "bp_syst2_nt1blm",
+  "bmi_nt1blm",
+  "alc_fl2w_nt1blq2",
+  "smo_stat_nt1blq2"
+  )
+
+run_cox_reg(
+  data = hunt_1_3,
+  time = follow_up_time,
+  status = death_all,
+  covariates = multi_adj_covariates_h1_h3_h4
+)
+```
 
 ### H1-H3-H4
 
@@ -97,39 +118,45 @@ Load data that's been processed in Stata:
 
 ```{r}
 
-hunt_1_3_4_cleaned_full_data <- read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_3_4_cleaned_full_data.csv")
+hunt_1_3_4 <- read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_3_4.csv")
 ```
 
 Process data that's been lost in the Stata process:
 
 ```{r}
 
-glimpse(hunt_1_3_4_cleaned_full_data)
+glimpse(hunt_1_3_4)
 
-hunt_1_3_4_cleaned_full_data <- hunt_1_3_4_cleaned_full_data |> 
-  mutate(
-    ltpa_index_nt1 = as_factor(ltpa_index_nt1),
-    ltpa_group_nt1 = as_factor(ltpa_group_nt1),
-    ltpa_index_nt3 = as_factor(ltpa_index_nt3),
-    ltpa_group_nt3 = as_factor(ltpa_group_nt3),
-    ltpa_index_nt4 = as_factor(ltpa_index_nt4),
-    ltpa_group_nt4 = as_factor(ltpa_group_nt4),
-    trajectory_group = as_factor(case_when(
-      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Low" ~ "Low, low, low",
-      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Moderate/high" ~ "Low, low, high",
-      ltpa_group_nt1 == "Low" & ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Moderate/high" ~ "Low, high, high",
-      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Moderate/high" ~ "High, high, high",
-      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Low" ~ "High, high, low",
-      ltpa_group_nt1 == "Moderate/high" & ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Low" ~ "High, low, low")
-    )
-  )
+hunt_1_3_4 <- hunt_1_3_4 |> 
+  process_hunt_1_3_4()
 ```
 
 #### Analyses
 
 Crude:
 
+```{r}
+
+run_cox_reg(
+  hunt_1_3_4,
+  time = follow_up_time,
+  status = death_all,
+  covariates = crude_covariates
+) |> 
+  view()
+```
+
 Multi-adjusted:
+
+```{r}
+
+run_cox_reg(
+  data = hunt_1_3_4,
+  time = follow_up_time,
+  status = death_all,
+  covariates = multi_adj_covariates_h1_h3_h4
+)
+```
 
 ### H3-H4
 
@@ -137,28 +164,17 @@ Multi-adjusted:
 
 ```{r}
 
-hunt_3_4_cleaned_full_data <-  read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_3_4_cleaned_full_data.csv")
+hunt_3_4 <- read_csv("//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_3_4.csv")
 ```
 
 Process data that's been lost in the Stata process:
 
 ```{r}
 
-glimpse(hunt_3_4_cleaned_full_data)
+glimpse(hunt_3_4)
 
-hunt_3_4_cleaned_full_data <- hunt_3_4_cleaned_full_data |> 
-  mutate(
-    ltpa_index_nt3 = as_factor(ltpa_index_nt3),
-    ltpa_group_nt3 = as_factor(ltpa_group_nt3),
-    ltpa_index_nt4 = as_factor(ltpa_index_nt4),
-    ltpa_group_nt4 = as_factor(ltpa_group_nt4),
-    trajectory_group = as_factor(case_when(
-      ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Low" ~ "Low, low",
-      ltpa_group_nt3 == "Low" & ltpa_group_nt4 == "Moderate/high" ~ "Low, high",
-      ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Low" ~ "High, low",
-      ltpa_group_nt3 == "Moderate/high" & ltpa_group_nt4 == "Moderate/high" ~ "High, high")
-    )
-  )
+hunt_3_4 <- hunt_3_4 |> 
+  process_hunt_3_4()
 
 ```
 
@@ -166,6 +182,29 @@ hunt_3_4_cleaned_full_data <- hunt_3_4_cleaned_full_data |>
 
 Crude:
 
+```{r}
+
+run_cox_reg(
+  hunt_3_4,
+  time = follow_up_time,
+  status = death_all,
+  covariates = crude_covariates
+) |> 
+  view()
+```
+
 
 Multi-adjusted:
 
+```{r}
+
+multi_adj_covariates_h3_h4 <- c(
+  "age",
+  "sex", 
+  "trajectory_group",
+  "bp_syst_mn23_nt3blm",
+  "bmi_nt3blm",
+  "alc_fly_nt3blq1",
+  "smo_stat_nt3blq1"
+)
+```

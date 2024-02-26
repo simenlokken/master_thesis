@@ -52,8 +52,8 @@ Read in data:
 
 ```{r}
 
-hunt_1_cleaned_full_data <- read_parquet(
-  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1_cleaned_full_data.parquet"
+hunt_1 <- read_parquet(
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_1.parquet"
 )
 ```
 
@@ -61,8 +61,11 @@ Apply data processing function:
 
 ```{r}
 
-hunt_1_cleaned_full_data <- hunt_1_cleaned_full_data |> 
-  process_hunt_1_no_change()
+glimpse(hunt_1)
+
+hunt_1 <- hunt_1 |> 
+  process_hunt_1()
+
 ```
 
 ##### Crude Cox Regression
@@ -169,8 +172,8 @@ Read in data:
 
 ```{r}
 
-hunt_2_cleaned_full_data <- read_parquet(
-  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_2_cleaned_full_data.parquet"
+hunt_2 <- read_parquet(
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_2.parquet"
 )
 ```
 
@@ -178,8 +181,10 @@ Apply data processing function:
 
 ```{r}
 
-hunt_2_cleaned_full_data <- hunt_2_cleaned_full_data |> 
-  process_hunt_2_no_change()
+glimpse(hunt_2)
+
+hunt_2 <- hunt_2 |> 
+  process_hunt_2()
 ```
 
 ##### Crude Cox Regression
@@ -273,8 +278,8 @@ Read in data:
 
 ```{r}
 
-hunt_3_cleaned_full_data <- read_parquet(
-  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_3_cleaned_full_data.parquet"
+hunt_3 <- read_parquet(
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_3.parquet"
 )
 ```
 
@@ -282,8 +287,10 @@ Apply data processing function:
 
 ```{r}
 
-hunt_3_cleaned_full_data <- hunt_3_cleaned_full_data |> 
-  process_hunt_3_no_change()
+glimpse(hunt_3)
+
+hunt_3 <- hunt_3 |> 
+  process_hunt_3()
 ```
 
 ##### Crude Cox Regression
@@ -382,8 +389,8 @@ Read in data:
 
 ```{r}
 
-hunt_4_cleaned_full_data <- read_parquet(
-  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_4_cleaned_full_data.parquet"
+hunt_4 <- read_parquet(
+  "//fil.nice.ntnu.no/nice/p758/data/my_data/hunt_4.parquet"
 )
 ```
 
@@ -391,8 +398,10 @@ Apply data processing function:
 
 ```{r}
 
-hunt_4_cleaned_full_data <- hunt_4_cleaned_full_data |> 
-  process_hunt_4_no_change()
+glimpse(hunt_4)
+
+hunt_4 <- hunt_4 |> 
+  process_hunt_4()
 ```
 
 ##### Crude Cox Regression
@@ -537,4 +546,3 @@ for (class in socioeconomic_class) {
 }
 
 ```
-
