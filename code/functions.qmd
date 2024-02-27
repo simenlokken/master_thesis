@@ -385,76 +385,42 @@ process_hunt_3_4 <- function(dataframe) {
 }
 ```
 
+## Cox regression
 
-## Regression modelling functions
-
-### Cox regression
-
-Cox regression function:
+Fit Cox model function:
 
 ```{r}
 
-run_cox_reg <- function(data, strata = NULL, time, status, covariates) {
+fit_cox_model <- function(data, stratum, covariates) {
+  stratum_sym <- rlang::sym(stratum)
+  data <- data |> 
+    drop_na(!!stratum_sym)
   
-  f <- paste0('Surv(', deparse(substitute(time)), ',',
-                     deparse(substitute(status)), ') ~ ', 
-                     paste(covariates, collapse = ' + '))
- 
-  data |> 
-    group_by({{ strata }}) |> 
-    drop_na({{ strata }}) |> 
-    nest() |> 
-    mutate(test_results = map(
-      .x = data, 
-      .f = ~ coxph(as.formula(f), data =.x) |> 
-      broom::tidy(conf.int = TRUE, exponentiate = TRUE))
-    ) |>  
-    unnest(test_results) |> 
-    select({{ strata }}, term, estimate, std.error, conf.low, conf.high) |> 
-    ungroup()
+  classes <- unique(data[[stratum]])
+  
+  models <- map(
+    .x = set_names(classes), 
+    .f = ~ {
+      filtered_data <- data |>  
+        filter(!!stratum_sym == .x)
+    
+      formula <- as.formula(paste("Surv(follow_up_time, death_all) ~", covariates))
+    
+      coxph(formula, data = filtered_data)
+  })
+  
+  return(models)
 }
+
 ```
 
 ## Other useful functions
-
-### Calculating number of participants
-
-```{r}
-
-calculate_num_of_participants <- function(dataframes, covariates) {
-  for (dataframe in dataframes) {
-    print(
-      get(dataframe) %>% 
-        select(all_of(covariates)) %>% 
-        drop_na() %>% 
-        count()
-    )
-  }
-}
-```
-
-### Calculating number of deaths
-
-```{r}
-
-calculate_num_of_deaths <- function(dataframes, covariates) {
-  for (dataframe in dataframes) {
-    print(
-      get(dataframe) %>% 
-        select(all_of(covariates)) %>% 
-        drop_na() %>% 
-        filter(death_all_cause == 2) |> # Death is coded as 2
-        count()
-    )
-  }
-}
-```
 
 ### Calculating follow-up time
 
 ```{r}
 
-calculate_person_years_follow_up <- function(dataframes, covariates) {
+calculate_follow_up_time <- function(dataframes, covariates) {
   
   for (dataframe in dataframes) {
     print(
@@ -467,54 +433,6 @@ calculate_person_years_follow_up <- function(dataframes, covariates) {
 }
 ```
 
-### Calculating stratified number of participants
-
-```{r}
-
-calculate_num_of_participants_strat <- function(dataframes, covariates, classes, stratifier) {
-  
-  for (dataframe in dataframes) {
-    data <- get(dataframe)
-    
-    for (class in classes) {
-      result <- data |> 
-        filter({{ stratifier }} == class) |> 
-        select(all_of(covariates)) |> 
-        drop_na() |> 
-        count()
-      print(
-        paste(
-          paste("Dataset:", dataframe, "class:", class, "number of participants:", result$n)
-        )
-      )
-    }
-  }
-}
-```
-
-### Calculating stratified follow-up time
-
-```{r}
-
-calculate_person_years_follow_up_strat <- function(dataframes, covariates, classes, stratifier) {
-  
-  for (dataframe in dataframes) {
-    data <- get(dataframe)
-    
-    for (class in classes) {
-      result <- data |> 
-        filter({{ stratifier }} == class) |>
-        select(all_of(covariates)) |> 
-        drop_na() |> 
-        summarise(person_years = sum(follow_up_time_in_years))
-      
-      print(
-        paste("Dataset:", dataframe, "class:", class, "person_years:", result$person_years)
-      )
-    }
-  }
-}
-```
 
 ### Count number of NA's in the whole dataframe
 
